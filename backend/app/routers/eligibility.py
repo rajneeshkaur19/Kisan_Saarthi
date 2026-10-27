@@ -1,14 +1,14 @@
-from fastapi import APIRouter, Depends
+﻿from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
-from backend.app.schemas import APIResponse, EligibilityRequest, EligibilityResult, APIError
+from backend.app.schemas import APIResponse, EligibilityRequest, EligibilityData, APIError
 from backend.app.db.database import get_db
 from backend.app.services.eligibility_service import evaluate_eligibility
 
 router = APIRouter(tags=["Eligibility Checker"])
 
 
-@router.post("/eligibility", response_model=APIResponse[EligibilityResult])
+@router.post("/eligibility", response_model=APIResponse[EligibilityData])
 def check_eligibility(
     req: EligibilityRequest,
     db: Session = Depends(get_db)
@@ -39,8 +39,8 @@ def download_checklist(
     include_pdf_base64: bool = True,
 ):
     """
-    Generate a PDF checklist for a specific scheme and return it (optionally base‑64 encoded).
-    The heavy lifting is done in `backend/app/services/mandi_service.py` – here we just format the response.
+    Generate a PDF checklist for a specific scheme and return it (optionally baseâ€‘64 encoded).
+    The heavy lifting is done in `backend/app/services/mandi_service.py` â€“ here we just format the response.
     """
     from backend.app.services.mandi_service import generate_checklist_pdf
 

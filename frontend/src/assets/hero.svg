@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 560" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#CFE8E4"/><stop offset="1" stop-color="#F1F6DC"/>
+    </linearGradient>
+    <linearGradient id="leafg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#8FD16A"/><stop offset="1" stop-color="#2F7A3B"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="560" fill="url(#sky)"/>
+  <circle cx="230" cy="130" r="62" fill="#E8B730"/>
+  <circle cx="230" cy="130" r="92" fill="#E8B730" opacity=".18"/>
+  <path d="M0 330C180 270 340 300 520 280S860 250 1200 300V560H0Z" fill="#9CCB7E"/>
+  <path d="M0 390C220 340 420 380 640 350S1000 330 1200 370V560H0Z" fill="#5FA043"/>
+  <path d="M0 460C260 420 520 450 760 430S1080 410 1200 440V560H0Z" fill="#1F4D2E"/>
+  <g stroke="#2F7A3B" stroke-width="3" stroke-linecap="round" opacity=".55">
+    <path d="M60 560 330 392M170 560 400 392M280 560 470 392M390 560 540 392M500 560 610 392M610 560 680 392"/>
+  </g>
+  <g transform="translate(760 70) rotate(18 160 210)">
+    <path d="M160 20C50 60 10 170 40 280c20 70 70 110 120 130 50-20 100-60 120-130 30-110-10-220-120-260Z" fill="url(#leafg)"/>
+    <path d="M160 20V410" stroke="#1F4D2E" stroke-width="5" stroke-linecap="round" opacity=".6"/>
+    <path d="M160 130 85 90M160 200 70 160M160 270 85 235M160 130l75-40M160 200l90-40M160 270l75-35" stroke="#1F4D2E" stroke-width="3" stroke-linecap="round" opacity=".4"/>
+    <circle cx="105" cy="215" r="18" fill="#7A4B22"/><circle cx="105" cy="215" r="9" fill="#4B2C12"/>
+    <circle cx="215" cy="150" r="13" fill="#7A4B22"/><circle cx="215" cy="150" r="6" fill="#4B2C12"/>
+    <circle cx="190" cy="285" r="10" fill="#7A4B22"/>
+  </g>
+  <g fill="none" stroke="#FFFFFF" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M745 150v-40h40"/><path d="M1085 110h40v40"/>
+    <path d="M1125 430v40h-40"/><path d="M785 470h-40v-40"/>
+  </g>
+  <rect x="800" y="470" width="190" height="42" rx="21" fill="#1F4D2E"/>
+  <circle cx="827" cy="491" r="9" fill="#E8B730"/>
+  <rect x="846" y="484" width="120" height="14" rx="7" fill="#9CCB7E"/>
+</svg>

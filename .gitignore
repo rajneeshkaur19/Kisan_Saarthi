@@ -8,3 +8,8 @@ __pycache__/
 **/.env
 .pytest_cache/
 dist/
+
+# Local databases
+*.db
+*.sqlite
+*.sqlite3

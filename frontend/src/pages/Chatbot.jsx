@@ -3,35 +3,36 @@ import { useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { changeLanguage } from '../i18n'
 import {
-  MessageSquare,
   Send,
   Mic,
   Volume2,
   VolumeX,
-  ShieldCheck,
-  Sparkles,
   RefreshCw,
   FileText,
-  User,
-  Bot
+  Bot,
+  BookOpen
 } from 'lucide-react'
-import { sendChatMessage } from '../api/client'
+import { sendChatMessage, normalizeLang } from '../api/client'
 
 export default function Chatbot() {
   const { t, i18n } = useTranslation()
   const location = useLocation()
-  const currentLang = i18n.language || 'en'
+  const langCode = normalizeLang(i18n.language)
+  const initialQuerySent = useRef(false)
+  const messagesEndRef = useRef(null)
 
   const [messages, setMessages] = useState([
     {
       id: 1,
       sender: 'assistant',
-      text: currentLang === 'hi'
+      text: langCode === 'hi'
         ? "नमस्ते किसान भाई! मैं किसानसारथी एआई सहायक हूँ। आप मुझसे फसल रोग, मंडी भाव या किसान क्रेडिट कार्ड जैसी किसी भी योजना के बारे में पूछ सकते हैं।"
-        : currentLang === 'pa'
-        ? "ਸਤਿ ਸ੍ਰੀ ਅਕਾਲ ਕਿਸਾਨ ਵੀਰੋ! मैं किसानसारथी एआई सहायक हूँ। ਤੁਸੀਂ ਮੇਰੇ ਤੋਂ ਫ਼ਸਲ ਦੀਆਂ ਬਿਮਾਰੀਆਂ, ਮੰਡੀ ਭਾਅ ਜਾਂ ਕਿਸਾਨ ਕ੍ਰੈਡਿਟ ਕਾਰਡ ਬਾਰੇ ਕੋਈ ਵੀ ਸਵਾਲ ਪੁੱਛ ਸਕਦੇ ਹੋ।"
+        : langCode === 'pa'
+        ? "ਸਤਿ ਸ੍ਰੀ ਅਕਾਲ ਕਿਸਾਨ ਵੀਰੋ! ਮੈਂ ਕਿਸਾਨਸਾਰਥੀ ਏਆਈ ਸਹਾਇਕ ਹਾਂ। ਤੁਸੀਂ ਮੇਰੇ ਤੋਂ ਫ਼ਸਲ ਦੀਆਂ ਬਿਮਾਰੀਆਂ, ਮੰਡੀ ਭਾਅ ਜਾਂ ਕਿਸਾਨ ਕ੍ਰੈਡਿਟ ਕਾਰਡ ਬਾਰੇ ਕੋਈ ਵੀ ਸਵਾਲ ਪੁੱਛ ਸਕਦੇ ਹੋ।"
         : "Hello Farmer friend! I am your KisanSaarthi AI assistant. You can ask me anything about crop diseases, mandi prices, or schemes like PM-KISAN & KCC.",
       sources: ['schemes.json', 'pm_kisan_guide.md'],
+      suggestions: [],
+      passages: [],
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     }
   ])
@@ -40,7 +41,6 @@ export default function Chatbot() {
   const [loading, setLoading] = useState(false)
   const [isListening, setIsListening] = useState(false)
   const [isSpeaking, setIsSpeaking] = useState(false)
-  const messagesEndRef = useRef(null)
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -50,9 +50,10 @@ export default function Chatbot() {
     scrollToBottom()
   }, [messages, loading])
 
-  // Handle initial query from navigation state
+  // Handle initial query from navigation state (StrictMode-safe)
   useEffect(() => {
-    if (location.state?.initialQuery) {
+    if (location.state?.initialQuery && !initialQuerySent.current) {
+      initialQuerySent.current = true
       handleSend(location.state.initialQuery)
       window.history.replaceState({}, document.title)
     }
@@ -69,19 +70,27 @@ export default function Chatbot() {
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     }
 
+    // Build history from prior messages before appending the new user turn
+    const history = messages.map((m) => ({
+      role: m.sender === 'user' ? 'user' : 'assistant',
+      content: m.text
+    }))
+
     setMessages((prev) => [...prev, userMessage])
     if (!textToSend) setInput('')
 
     try {
       setLoading(true)
-      const res = await sendChatMessage(queryText, currentLang)
+      const res = await sendChatMessage(queryText, langCode, history)
       if (res.status === 'ok') {
         const assistantMessage = {
           id: Date.now() + 1,
           sender: 'assistant',
           text: res.data.response,
-          sources: res.data.sources,
-          passages: res.data.retrieved_passages,
+          sources: res.data.sources || [],
+          passages: res.data.retrieved_passages || [],
+          suggestions: res.data.suggestions || [],
+          is_fallback: res.data.is_fallback,
           timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
         }
         setMessages((prev) => [...prev, assistantMessage])
@@ -93,6 +102,8 @@ export default function Chatbot() {
             sender: 'assistant',
             text: "Sorry, I encountered an issue querying the agricultural knowledge base. Please try again.",
             sources: [],
+            passages: [],
+            suggestions: [],
             timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
           }
         ])
@@ -105,6 +116,8 @@ export default function Chatbot() {
           sender: 'assistant',
           text: "Network error connecting to KisanSaarthi AI server. Please verify your connection.",
           sources: [],
+          passages: [],
+          suggestions: [],
           timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
         }
       ])
@@ -124,7 +137,7 @@ export default function Chatbot() {
     try {
       const recognition = new SpeechRecognition()
       const langMap = { hi: 'hi-IN', pa: 'pa-IN', en: 'en-IN' }
-      recognition.lang = langMap[currentLang.slice(0, 2)] || 'hi-IN'
+      recognition.lang = langMap[langCode] || 'hi-IN'
       recognition.interimResults = false
 
       recognition.onstart = () => setIsListening(true)
@@ -141,7 +154,7 @@ export default function Chatbot() {
     }
   }
 
-  // Text-to-Speech Output
+  // Text-to-Speech: try pa-IN then fall back to hi-IN for Punjabi
   const handleSpeak = (text) => {
     if (!window.speechSynthesis) return
     if (isSpeaking) {
@@ -152,33 +165,56 @@ export default function Chatbot() {
 
     const cleanText = text.replace(/[*#_`]/g, '')
     const utterance = new SpeechSynthesisUtterance(cleanText)
-    const langMap = { hi: 'hi-IN', pa: 'hi-IN', en: 'en-IN' }
-    utterance.lang = langMap[currentLang.slice(0, 2)] || 'en-IN'
+
+    if (langCode === 'pa') {
+      utterance.lang = 'pa-IN'
+      utterance.onerror = () => {
+        const fallback = new SpeechSynthesisUtterance(cleanText)
+        fallback.lang = 'hi-IN'
+        fallback.onend = () => setIsSpeaking(false)
+        fallback.onerror = () => setIsSpeaking(false)
+        window.speechSynthesis.speak(fallback)
+      }
+    } else {
+      const langMap = { hi: 'hi-IN', en: 'en-IN' }
+      utterance.lang = langMap[langCode] || 'en-IN'
+      utterance.onerror = () => setIsSpeaking(false)
+    }
 
     utterance.onend = () => setIsSpeaking(false)
-    utterance.onerror = () => setIsSpeaking(false)
 
     setIsSpeaking(true)
     window.speechSynthesis.speak(utterance)
   }
 
-  const suggestionChips = currentLang === 'hi'
+  const suggestionChips = langCode === 'hi'
     ? [
         { label: 'फसल का इलाज', q: 'गेहूं के पीले पत्तों का क्या इलाज है?' },
         { label: 'आज की मंडी कीमत', q: 'लुधियाना मंडी में गेहूं का ताजा भाव क्या है?' },
         { label: 'किसान क्रेडिट / योजना', q: 'किसान क्रेडिट कार्ड पर ब्याज दर और पात्रता क्या है?' }
       ]
-    : currentLang === 'pa'
+    : langCode === 'pa'
     ? [
         { label: 'ਫ਼ਸਲ ਦਾ ਇਲਾਜ', q: 'ਕਣਕ ਦੇ ਪੀਲੇ ਰੱਤੂਏ ਦਾ ਇਲਾਜ ਦੱਸੋ' },
         { label: 'ਮੰਡੀ ਭਾਅ', q: 'ਅੱਜ ਲੁਧਿਆਣਾ ਮੰਡੀ ਵਿੱਚ ਕਣਕ ਦਾ ਰੇਟ ਕੀ ਹੈ?' },
-        { label: 'ਕਿਸਾਨ ਕ੍ਰੈਡਿਟ ਕਾਰਡ', q: 'ਕਿਸਾਨ ਕ੍ਰੈਡਿਟ ਕਾਰਡ 4% ਵਿਆਜ ਦਰ ' }
+        { label: 'ਕਿਸਾਨ ਕ੍ਰੈਡਿਟ ਕਾਰਡ', q: 'ਕਿਸਾਨ ਕ੍ਰੈਡਿਟ ਕਾਰਡ 4% ਵਿਆਜ ਦਰ ਅਤੇ ਪਾਤਰਤਾ ਬਾਰੇ ਦੱਸੋ।' }
       ]
     : [
         { label: 'Crop Disease Cure', q: 'What is the treatment for early blight in tomato?' },
         { label: "Today's Mandi Price", q: 'What is today wheat price in Ludhiana APMC?' },
         { label: 'KCC Loan at 4%', q: 'How to apply for Kisan Credit Card loan?' }
       ]
+
+  // Latest assistant suggestions (from API), fall back to static chips
+  const latestSuggestions = [...messages]
+    .reverse()
+    .find((m) => m.sender === 'assistant' && m.suggestions?.length)?.suggestions
+
+  const chipsToShow = latestSuggestions?.length
+    ? latestSuggestions.map((s) =>
+        typeof s === 'string' ? { label: s, q: s } : { label: s.label || s.text || s.q, q: s.q || s.text || s.label }
+      )
+    : suggestionChips
 
   return (
     <div className="max-w-4xl mx-auto flex flex-col h-[calc(100vh-6rem)] pb-18 md:pb-4">
@@ -210,7 +246,7 @@ export default function Chatbot() {
               key={l.code}
               onClick={() => changeLanguage(l.code)}
               className={`px-2.5 py-1 rounded-lg transition-all ${
-                currentLang.startsWith(l.code)
+                langCode === l.code
                   ? 'bg-emerald-700 text-white shadow-2xs'
                   : 'text-gray-600 hover:text-gray-900'
               }`}
@@ -253,9 +289,52 @@ export default function Chatbot() {
                         key={idx}
                         className="bg-emerald-50 text-emerald-900 font-semibold px-2 py-0.5 rounded-md border border-emerald-200/60"
                       >
-                        {s}
+                        {typeof s === 'string' ? s : s.title || s.source || s.name}
                       </span>
                     ))}
+                  </div>
+                )}
+
+                {/* Retrieved passages */}
+                {msg.passages && msg.passages.length > 0 && (
+                  <div className="mt-3 pt-2.5 border-t border-emerald-50 space-y-2">
+                    <span className="text-[10px] font-bold text-emerald-800 flex items-center gap-1">
+                      <BookOpen className="w-3 h-3 text-emerald-600" />
+                      Retrieved passages:
+                    </span>
+                    {msg.passages.slice(0, 3).map((p, idx) => (
+                      <div
+                        key={idx}
+                        className="bg-gray-50 border border-gray-100 rounded-lg p-2 text-[10px] text-gray-600 leading-relaxed"
+                      >
+                        <p className="font-semibold text-gray-700 mb-0.5">
+                          {typeof p === 'string' ? `Passage ${idx + 1}` : p.title || p.source || `Passage ${idx + 1}`}
+                        </p>
+                        <p className="line-clamp-3">
+                          {typeof p === 'string' ? p : p.text || p.content || p.passage || ''}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Per-message suggestion chips from API */}
+                {msg.suggestions && msg.suggestions.length > 0 && (
+                  <div className="mt-3 pt-2.5 border-t border-emerald-50 flex flex-wrap gap-1.5">
+                    {msg.suggestions.map((s, idx) => {
+                      const q = typeof s === 'string' ? s : s.q || s.text || s.label
+                      const label = typeof s === 'string' ? s : s.label || s.text || s.q
+                      return (
+                        <button
+                          key={idx}
+                          type="button"
+                          onClick={() => handleSend(q)}
+                          className="text-[10px] bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border border-emerald-100 px-2 py-0.5 rounded-md font-medium cursor-pointer"
+                        >
+                          {label}
+                        </button>
+                      )
+                    })}
                   </div>
                 )}
               </div>
@@ -296,7 +375,7 @@ export default function Chatbot() {
         <span className="text-[10px] font-bold uppercase text-gray-400 tracking-wider">
           Suggested:
         </span>
-        {suggestionChips.map((chip, i) => (
+        {chipsToShow.map((chip, i) => (
           <button
             key={i}
             onClick={() => handleSend(chip.q)}

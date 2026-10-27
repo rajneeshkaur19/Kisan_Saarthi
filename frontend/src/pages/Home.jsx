@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import {
@@ -9,17 +9,16 @@ import {
   Mic,
   Send,
   ArrowRight,
-  Sparkles,
   AlertCircle,
   CheckCircle,
   Wheat,
   CloudSun,
   Droplets,
   Wind,
-  ShieldCheck,
-  Compass
+  Compass,
+  RefreshCw
 } from 'lucide-react'
-import { getWeather } from '../api/client'
+import { getWeather, getMandiPrices } from '../api/client'
 
 export default function Home() {
   const { t, i18n } = useTranslation()
@@ -27,14 +26,43 @@ export default function Home() {
   const [query, setQuery] = useState('')
   const [isListening, setIsListening] = useState(false)
   const [weather, setWeather] = useState(null)
+  const [weatherLoading, setWeatherLoading] = useState(true)
+  const [weatherError, setWeatherError] = useState(null)
+  const [mandiRecord, setMandiRecord] = useState(null)
 
-  useEffect(() => {
+  const fetchWeather = useCallback(() => {
+    setWeatherLoading(true)
+    setWeatherError(null)
     getWeather('ludhiana')
       .then((res) => {
-        if (res.status === 'ok') setWeather(res.data)
+        if (res.status === 'ok') {
+          setWeather(res.data)
+          setWeatherError(null)
+        } else {
+          setWeather(null)
+          setWeatherError(res.error?.message || 'Could not load weather.')
+        }
       })
-      .catch((err) => console.log('Weather fetch notice:', err))
+      .catch(() => {
+        setWeather(null)
+        setWeatherError('Could not reach weather service.')
+      })
+      .finally(() => setWeatherLoading(false))
   }, [])
+
+  useEffect(() => {
+    fetchWeather()
+
+    getMandiPrices('Wheat', 'ludhiana')
+      .then((res) => {
+        if (res.status === 'ok' && res.data?.selected_record) {
+          setMandiRecord(res.data.selected_record)
+        }
+      })
+      .catch(() => {
+        /* keep fallback card empty */
+      })
+  }, [fetchWeather])
 
   const handleSearchSubmit = (e) => {
     e.preventDefault()
@@ -104,19 +132,19 @@ export default function Home() {
     {
       step: '1',
       title: 'Diagnose Leaf',
-      desc: 'MobileNetV2 Early Blight test',
+      desc: 'Try a sample leaf diagnosis',
       action: () => navigate('/doctor')
     },
     {
       step: '2',
       title: 'Mandi Rates',
-      desc: 'Ludhiana Wheat +2.1% Hold',
+      desc: 'Ludhiana Wheat live rates',
       action: () => navigate('/prices?crop=Wheat&mandi=ludhiana')
     },
     {
       step: '3',
       title: 'Credit Score',
-      desc: 'Score 97/100 & PDF Checklist',
+      desc: 'Score & PDF Checklist',
       action: () => navigate('/schemes')
     },
     {
@@ -126,6 +154,9 @@ export default function Home() {
       action: () => navigate('/chat', { state: { initialQuery: 'ਕਿਸਾਨ ਕ੍ਰੈਡਿਟ ਕਾਰਡ ਲਈ ਕਿਹੜੇ ਕਾਗਜ਼ ਚਾਹੀਦੇ ਹਨ?' } })
     }
   ]
+
+  const isHold = mandiRecord?.recommendation === 'HOLD'
+  const isSell = mandiRecord?.recommendation === 'SELL'
 
   return (
     <div className="space-y-6 pb-20 md:pb-8">
@@ -148,41 +179,19 @@ export default function Home() {
         <div className="absolute right-0 bottom-0 translate-x-8 translate-y-8 w-60 h-60 bg-emerald-600/30 rounded-full blur-2xl pointer-events-none" />
       </div>
 
-      {/* Hackathon Interactive Demo Tour Banner */}
-      <div className="bg-gradient-to-r from-amber-50 to-emerald-50 rounded-2xl p-4 md:p-5 border border-amber-200/80 shadow-xs">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
-          <div className="flex items-center gap-2">
-            <span className="p-1 rounded-lg bg-amber-500 text-white font-bold text-xs">
-              <Compass className="w-4 h-4" />
-            </span>
-            <h4 className="text-sm font-extrabold text-gray-900 tracking-tight">
-              Judge & Evaluator 3-Minute Demo Walkthrough
-            </h4>
-          </div>
-          <span className="text-[11px] font-semibold text-amber-800 bg-amber-100/80 px-2.5 py-0.5 rounded-full self-start sm:self-auto">
-            Interactive Test Flow
-          </span>
-        </div>
-
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5">
-          {demoTourSteps.map((st, i) => (
-            <button
-              key={i}
-              onClick={st.action}
-              className="bg-white/90 hover:bg-white rounded-xl p-3 border border-amber-100 text-left transition-all hover:shadow-xs group cursor-pointer"
-            >
-              <div className="flex items-center gap-1.5 mb-1">
-                <span className="w-5 h-5 rounded-full bg-emerald-700 text-white font-bold text-[10px] flex items-center justify-center">
-                  {st.step}
-                </span>
-                <span className="text-xs font-bold text-gray-900 group-hover:text-emerald-700 transition-colors">
-                  {st.title}
-                </span>
-              </div>
-              <p className="text-[10px] text-gray-500 line-clamp-1">{st.desc}</p>
-            </button>
-          ))}
-        </div>
+      {/* Soft tip instead of Judge & Evaluator banner */}
+      <div className="flex items-start gap-2 px-1 py-1 text-xs text-gray-500">
+        <Compass className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
+        <p>
+          Tip: try leaf diagnosis, Ludhiana wheat rates, schemes checklist, or ask Saarthi in your language.
+          <button
+            type="button"
+            onClick={demoTourSteps[0].action}
+            className="ml-1 text-emerald-700 font-semibold hover:underline cursor-pointer"
+          >
+            Start with Crop Doctor →
+          </button>
+        </p>
       </div>
 
       {/* Prominent Talk to AI Assistant Search Box */}
@@ -288,7 +297,7 @@ export default function Home() {
 
       {/* Snapshot Cards: Mandi, Weather Spray Advisory, Credit */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {/* Mandi Snapshot */}
+        {/* Mandi Snapshot — live selected_record */}
         <div className="bg-white rounded-2xl p-5 border border-gray-200/80 shadow-xs flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-3">
@@ -297,25 +306,41 @@ export default function Home() {
                 <h4 className="text-sm font-bold text-gray-900">Today's Mandi Highlight</h4>
               </div>
               <button
-                onClick={() => navigate('/prices')}
+                onClick={() => navigate('/prices?crop=Wheat&mandi=ludhiana')}
                 className="text-xs font-semibold text-emerald-700 hover:text-emerald-800 cursor-pointer"
               >
                 View →
               </button>
             </div>
-            <div className="p-3 bg-emerald-50/60 rounded-xl border border-emerald-100 flex items-center justify-between">
-              <div>
-                <p className="text-xs text-emerald-900/70 font-semibold">Wheat (PBW 826)</p>
-                <p className="text-lg font-black text-emerald-950">₹ 2,350 <span className="text-xs font-medium text-gray-500">/ q</span></p>
-                <p className="text-[10px] text-gray-500">Ludhiana APMC</p>
+            {mandiRecord ? (
+              <div className="p-3 bg-emerald-50/60 rounded-xl border border-emerald-100 flex items-center justify-between">
+                <div>
+                  <p className="text-xs text-emerald-900/70 font-semibold">
+                    {mandiRecord.crop}
+                    {mandiRecord.variety ? ` (${mandiRecord.variety})` : ''}
+                  </p>
+                  <p className="text-lg font-black text-emerald-950">
+                    ₹ {mandiRecord.current_price?.toLocaleString('en-IN')}{' '}
+                    <span className="text-xs font-medium text-gray-500">/ q</span>
+                  </p>
+                  <p className="text-[10px] text-gray-500">{mandiRecord.mandi}</p>
+                </div>
+                <div className="text-right">
+                  <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-bold text-white ${
+                    isHold ? 'bg-emerald-600' : isSell ? 'bg-amber-600' : 'bg-gray-600'
+                  }`}>
+                    {mandiRecord.recommendation}
+                  </span>
+                  <p className="text-[9px] text-gray-500 mt-0.5 max-w-[110px] line-clamp-2">
+                    {mandiRecord.recommendation_reason}
+                  </p>
+                </div>
               </div>
-              <div className="text-right">
-                <span className="inline-block px-2 py-0.5 rounded-full text-xs font-bold bg-emerald-600 text-white">
-                  HOLD (+2.1%)
-                </span>
-                <p className="text-[9px] text-gray-500 mt-0.5">Firming demand</p>
+            ) : (
+              <div className="p-3 bg-gray-50 rounded-xl border border-gray-100 text-xs text-gray-500">
+                Loading mandi rates…
               </div>
-            </div>
+            )}
           </div>
           <p className="text-[10px] text-gray-400 mt-2">
             Agmarknet APMC Modal Rate
@@ -334,7 +359,27 @@ export default function Home() {
                 Ludhiana
               </span>
             </div>
-            {weather ? (
+            {weatherLoading ? (
+              <p className="text-xs text-gray-400 flex items-center gap-1.5">
+                <RefreshCw className="w-3.5 h-3.5 animate-spin text-emerald-600" />
+                Loading agromet advisory...
+              </p>
+            ) : weatherError ? (
+              <div className="space-y-2">
+                <p className="text-xs text-red-700 flex items-center gap-1.5">
+                  <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                  {weatherError}
+                </p>
+                <button
+                  type="button"
+                  onClick={fetchWeather}
+                  className="text-xs font-bold text-emerald-700 hover:text-emerald-800 flex items-center gap-1 cursor-pointer"
+                >
+                  <RefreshCw className="w-3 h-3" />
+                  Retry
+                </button>
+              </div>
+            ) : weather ? (
               <div className="space-y-2">
                 <div className="flex items-center justify-between text-xs font-semibold text-gray-700">
                   <span className="flex items-center gap-1">
@@ -356,9 +401,7 @@ export default function Home() {
                   </p>
                 </div>
               </div>
-            ) : (
-              <p className="text-xs text-gray-400">Loading agromet advisory...</p>
-            )}
+            ) : null}
           </div>
           <p className="text-[10px] text-gray-400 mt-2">
             IMD Gramin Krishi Mausam Sewa

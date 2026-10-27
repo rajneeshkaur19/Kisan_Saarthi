@@ -63,6 +63,7 @@ class DiagnoseData(BaseModel):
     model_version: str
     model_loaded: bool
     source_attribution: str = "MobileNetV2 Transfer Learning on PlantVillage Botanical Dataset"
+    demo_mode: bool = False
 
 
 # ----------------------------------------------------------------------

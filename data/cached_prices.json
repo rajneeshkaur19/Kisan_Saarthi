@@ -1,0 +1,401 @@
+{
+  "metadata": {
+    "source": "Agmarknet (Ministry of Agriculture & Farmers Welfare)",
+    "source_type": "CACHED_OFFICIAL_RECORDS",
+    "last_synced": "2026-10-26T18:00:00+05:30",
+    "disclaimer": "Sample APMC data for local development."
+  },
+  "commodities": [
+    "Wheat",
+    "Paddy",
+    "Potato",
+    "Tomato",
+    "Cotton",
+    "Soybean",
+    "Onion"
+  ],
+  "mandis": [
+    {
+      "id": "ludhiana",
+      "name": "Ludhiana APMC",
+      "district": "Ludhiana",
+      "state": "Punjab"
+    },
+    {
+      "id": "amritsar",
+      "name": "Amritsar APMC",
+      "district": "Amritsar",
+      "state": "Punjab"
+    },
+    {
+      "id": "karnal",
+      "name": "Karnal APMC",
+      "district": "Karnal",
+      "state": "Haryana"
+    }
+  ],
+  "records": {
+    "ludhiana_Wheat": {
+      "crop": "Wheat",
+      "mandi": "Ludhiana APMC",
+      "district": "Ludhiana",
+      "state": "Punjab",
+      "variety": "PBW 343",
+      "unit": "₹ / quintal",
+      "current_price": 2425.0,
+      "min_price": 2350.0,
+      "max_price": 2480.0,
+      "modal_price": 2425.0,
+      "msp_benchmark": 2275.0,
+      "arrivals_tonnes": 420.5,
+      "last_updated": "2026-10-26T18:00:00+05:30",
+      "recommendation": "SELL",
+      "recommendation_reason": "Modal price is above MSP with steady arrivals.",
+      "trend_percent": 2.4,
+      "trend_direction": "up",
+      "history": [
+        {
+          "date": "2026-10-20",
+          "price": 2360
+        },
+        {
+          "date": "2026-10-22",
+          "price": 2385
+        },
+        {
+          "date": "2026-10-24",
+          "price": 2400
+        },
+        {
+          "date": "2026-10-26",
+          "price": 2425
+        }
+      ],
+      "nearby_comparisons": [
+        {
+          "mandi": "Amritsar APMC",
+          "distance": "12 km",
+          "price": 2390.0,
+          "trend": "+1.1%"
+        },
+        {
+          "mandi": "Karnal APMC",
+          "distance": "20 km",
+          "price": 2410.0,
+          "trend": "-0.4%"
+        }
+      ],
+      "source": "Agmarknet"
+    },
+    "ludhiana_Paddy": {
+      "crop": "Paddy",
+      "mandi": "Ludhiana APMC",
+      "district": "Ludhiana",
+      "state": "Punjab",
+      "variety": "PR 126",
+      "unit": "₹ / quintal",
+      "current_price": 2320.0,
+      "min_price": 2280.0,
+      "max_price": 2360.0,
+      "modal_price": 2320.0,
+      "msp_benchmark": 2300.0,
+      "arrivals_tonnes": 880.0,
+      "last_updated": "2026-10-26T18:00:00+05:30",
+      "recommendation": "HOLD",
+      "recommendation_reason": "Price is close to MSP; wait for clearer upward movement.",
+      "trend_percent": -0.8,
+      "trend_direction": "down",
+      "history": [
+        {
+          "date": "2026-10-20",
+          "price": 2340
+        },
+        {
+          "date": "2026-10-22",
+          "price": 2335
+        },
+        {
+          "date": "2026-10-24",
+          "price": 2325
+        },
+        {
+          "date": "2026-10-26",
+          "price": 2320
+        }
+      ],
+      "nearby_comparisons": [
+        {
+          "mandi": "Amritsar APMC",
+          "distance": "12 km",
+          "price": 2310.0,
+          "trend": "+1.1%"
+        },
+        {
+          "mandi": "Karnal APMC",
+          "distance": "20 km",
+          "price": 2330.0,
+          "trend": "-0.4%"
+        }
+      ],
+      "source": "Agmarknet"
+    },
+    "ludhiana_Potato": {
+      "crop": "Potato",
+      "mandi": "Ludhiana APMC",
+      "district": "Ludhiana",
+      "state": "Punjab",
+      "variety": "Chipsona",
+      "unit": "₹ / quintal",
+      "current_price": 1450.0,
+      "min_price": 1320.0,
+      "max_price": 1580.0,
+      "modal_price": 1450.0,
+      "msp_benchmark": 0.0,
+      "arrivals_tonnes": 95.0,
+      "last_updated": "2026-10-26T18:00:00+05:30",
+      "recommendation": "SELL",
+      "recommendation_reason": "Local demand is firm and nearby mandis are quoting lower.",
+      "trend_percent": 5.1,
+      "trend_direction": "up",
+      "history": [
+        {
+          "date": "2026-10-20",
+          "price": 1380
+        },
+        {
+          "date": "2026-10-22",
+          "price": 1400
+        },
+        {
+          "date": "2026-10-24",
+          "price": 1425
+        },
+        {
+          "date": "2026-10-26",
+          "price": 1450
+        }
+      ],
+      "nearby_comparisons": [
+        {
+          "mandi": "Amritsar APMC",
+          "distance": "12 km",
+          "price": 1410.0,
+          "trend": "+1.1%"
+        },
+        {
+          "mandi": "Karnal APMC",
+          "distance": "20 km",
+          "price": 1395.0,
+          "trend": "-0.4%"
+        }
+      ],
+      "source": "Agmarknet"
+    },
+    "amritsar_Tomato": {
+      "crop": "Tomato",
+      "mandi": "Amritsar APMC",
+      "district": "Amritsar",
+      "state": "Punjab",
+      "variety": "Hybrid",
+      "unit": "₹ / quintal",
+      "current_price": 2100.0,
+      "min_price": 1800.0,
+      "max_price": 2400.0,
+      "modal_price": 2100.0,
+      "msp_benchmark": 0.0,
+      "arrivals_tonnes": 42.0,
+      "last_updated": "2026-10-26T18:00:00+05:30",
+      "recommendation": "HOLD",
+      "recommendation_reason": "Volatile arrivals; prices may firm up mid-week.",
+      "trend_percent": 1.2,
+      "trend_direction": "up",
+      "history": [
+        {
+          "date": "2026-10-20",
+          "price": 2050
+        },
+        {
+          "date": "2026-10-22",
+          "price": 2080
+        },
+        {
+          "date": "2026-10-24",
+          "price": 2075
+        },
+        {
+          "date": "2026-10-26",
+          "price": 2100
+        }
+      ],
+      "nearby_comparisons": [
+        {
+          "mandi": "Ludhiana APMC",
+          "distance": "12 km",
+          "price": 2150.0,
+          "trend": "+1.1%"
+        },
+        {
+          "mandi": "Karnal APMC",
+          "distance": "20 km",
+          "price": 1980.0,
+          "trend": "-0.4%"
+        }
+      ],
+      "source": "Agmarknet"
+    },
+    "karnal_Cotton": {
+      "crop": "Cotton",
+      "mandi": "Karnal APMC",
+      "district": "Karnal",
+      "state": "Haryana",
+      "variety": "Kapas",
+      "unit": "₹ / quintal",
+      "current_price": 6850.0,
+      "min_price": 6700.0,
+      "max_price": 7000.0,
+      "modal_price": 6850.0,
+      "msp_benchmark": 6620.0,
+      "arrivals_tonnes": 110.0,
+      "last_updated": "2026-10-26T18:00:00+05:30",
+      "recommendation": "SELL",
+      "recommendation_reason": "Trading above MSP with healthy arrivals.",
+      "trend_percent": 0.6,
+      "trend_direction": "up",
+      "history": [
+        {
+          "date": "2026-10-20",
+          "price": 6800
+        },
+        {
+          "date": "2026-10-22",
+          "price": 6820
+        },
+        {
+          "date": "2026-10-24",
+          "price": 6840
+        },
+        {
+          "date": "2026-10-26",
+          "price": 6850
+        }
+      ],
+      "nearby_comparisons": [
+        {
+          "mandi": "Ludhiana APMC",
+          "distance": "12 km",
+          "price": 6780.0,
+          "trend": "+1.1%"
+        },
+        {
+          "mandi": "Amritsar APMC",
+          "distance": "20 km",
+          "price": 6810.0,
+          "trend": "-0.4%"
+        }
+      ],
+      "source": "Agmarknet"
+    },
+    "ludhiana_Soybean": {
+      "crop": "Soybean",
+      "mandi": "Ludhiana APMC",
+      "district": "Ludhiana",
+      "state": "Punjab",
+      "variety": "JS 335",
+      "unit": "₹ / quintal",
+      "current_price": 4325.0,
+      "min_price": 4200.0,
+      "max_price": 4400.0,
+      "modal_price": 4325.0,
+      "msp_benchmark": 4300.0,
+      "arrivals_tonnes": 55.0,
+      "last_updated": "2026-10-26T18:00:00+05:30",
+      "recommendation": "HOLD",
+      "recommendation_reason": "Price is near MSP; wait for clearer upward movement.",
+      "trend_percent": 1.0,
+      "trend_direction": "up",
+      "history": [
+        {
+          "date": "2026-10-20",
+          "price": 4200
+        },
+        {
+          "date": "2026-10-22",
+          "price": 4250
+        },
+        {
+          "date": "2026-10-24",
+          "price": 4300
+        },
+        {
+          "date": "2026-10-26",
+          "price": 4325
+        }
+      ],
+      "nearby_comparisons": [
+        {
+          "mandi": "Amritsar APMC",
+          "distance": "18 km",
+          "price": 4280,
+          "trend": "+0.6%"
+        },
+        {
+          "mandi": "Karnal APMC",
+          "distance": "42 km",
+          "price": 4340,
+          "trend": "+1.2%"
+        }
+      ]
+    },
+    "ludhiana_Onion": {
+      "crop": "Onion",
+      "mandi": "Ludhiana APMC",
+      "district": "Ludhiana",
+      "state": "Punjab",
+      "variety": "Nashik Red",
+      "unit": "₹ / quintal",
+      "current_price": 1780.0,
+      "min_price": 1600.0,
+      "max_price": 1850.0,
+      "modal_price": 1780.0,
+      "msp_benchmark": 0.0,
+      "arrivals_tonnes": 70.0,
+      "last_updated": "2026-10-26T18:00:00+05:30",
+      "recommendation": "SELL",
+      "recommendation_reason": "Local demand firm and arrivals steady.",
+      "trend_percent": 3.5,
+      "trend_direction": "up",
+      "history": [
+        {
+          "date": "2026-10-20",
+          "price": 1650
+        },
+        {
+          "date": "2026-10-22",
+          "price": 1700
+        },
+        {
+          "date": "2026-10-24",
+          "price": 1750
+        },
+        {
+          "date": "2026-10-26",
+          "price": 1780
+        }
+      ],
+      "nearby_comparisons": [
+        {
+          "mandi": "Amritsar APMC",
+          "distance": "18 km",
+          "price": 1720,
+          "trend": "+2.1%"
+        },
+        {
+          "mandi": "Karnal APMC",
+          "distance": "42 km",
+          "price": 1690,
+          "trend": "+1.4%"
+        }
+      ]
+    }
+  }
+}

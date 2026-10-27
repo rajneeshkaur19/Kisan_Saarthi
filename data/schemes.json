@@ -1,0 +1,47 @@
+[
+  {
+    "id": "KCC",
+    "code": "KCC",
+    "name": "Kisan Credit Card",
+    "short_name": "KCC",
+    "category": "Credit",
+    "names": {
+      "en": "Kisan Credit Card",
+      "hi": "किसान क्रेडिट कार्ड",
+      "pa": "ਕਿਸਾਨ ਕ੍ਰੈਡਿਟ ਕਾਰਡ"
+    },
+    "financial_benefit": "Short-term crop loan at ~4% effective interest with interest subvention",
+    "required_documents": ["Aadhaar", "Land records", "Bank passbook", "Passport photo"],
+    "official_portal": "https://www.nabard.org/kcc.aspx"
+  },
+  {
+    "id": "PM-KISAN",
+    "code": "PM-KISAN",
+    "name": "PM-KISAN Samman Nidhi",
+    "short_name": "PM-KISAN",
+    "category": "Income Support",
+    "names": {
+      "en": "PM-KISAN Samman Nidhi",
+      "hi": "पीएम-किसान सम्मान निधि",
+      "pa": "ਪੀਐਮ-ਕਿਸਾਨ ਸਨਮਾਨ ਨਿਧੀ"
+    },
+    "financial_benefit": "₹6,000 per year in three equal instalments via DBT",
+    "required_documents": ["Aadhaar", "Land records", "Bank account with DBT"],
+    "official_portal": "https://pmkisan.gov.in/"
+  },
+  {
+    "id": "PMFBY",
+    "code": "PMFBY",
+    "name": "Pradhan Mantri Fasal Bima Yojana",
+    "short_name": "PMFBY",
+    "category": "Insurance",
+    "names": {
+      "en": "Pradhan Mantri Fasal Bima Yojana",
+      "hi": "प्रधानमंत्री फसल बीमा योजना",
+      "pa": "ਪ੍ਰਧਾਨ ਮੰਤਰੀ ਫਸਲ ਬੀਮਾ ਯੋਜਨਾ"
+    },
+    "financial_benefit": "Crop insurance with farmer premium of 1.5–5% depending on season/crop",
+    "required_documents": ["Aadhaar", "Land records", "Sowing certificate", "Bank passbook"],
+    "official_portal": "https://pmfby.gov.in/"
+  }
+]

@@ -22,9 +22,8 @@ def check_health(db: Session = Depends(get_db)):
     except Exception as exc:
         print(f"[Health] Database check failed: {exc}")
 
-    # This indicates that the key is configured, not that an API call
-    # to Gemini has been verified successfully.
-    gemini_configured = bool(os.getenv("GEMINI_API_KEY"))
+    # Key configured in .env / process env (not a live Gemini ping).
+    gemini_configured = bool(settings.GEMINI_API_KEY or os.getenv("GEMINI_API_KEY"))
 
     return APIResponse(
         status="ok" if db_ok else "error",

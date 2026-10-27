@@ -62,7 +62,8 @@ async def diagnose(
             data=None,
             error=APIError(code="IMAGE_PROCESSING_ERROR", message=str(ve))
         )
-    except Exception:
+    except Exception as exc:
+        print(f"[Diagnose] Unexpected error: {type(exc).__name__}: {exc}")
         return APIResponse(
             status="error",
             data=None,

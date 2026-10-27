@@ -7,25 +7,22 @@ import {
   Download,
   ShieldCheck,
   FileText,
-  HelpCircle,
   AlertCircle,
   X,
   ExternalLink,
-  ChevronRight,
-  TrendingUp,
   RefreshCw,
   Sparkles,
-  MessageSquare
+  MessageSquare,
+  Info
 } from 'lucide-react'
-import { checkEligibility, downloadChecklist } from '../api/client'
+import { checkEligibility, downloadChecklist, normalizeLang } from '../api/client'
 
 export default function LoanSchemes() {
   const { t, i18n } = useTranslation()
   const location = useLocation()
   const navigate = useNavigate()
-  const currentLang = i18n.language || 'en'
+  const currentLang = normalizeLang(i18n.language)
 
-  const [activeTab, setActiveTab] = useState('check') // 'check' | 'all'
   const [landHolding, setLandHolding] = useState('3.5')
   const [annualIncome, setAnnualIncome] = useState('1 - 3 lakh')
   const [primaryCrop, setPrimaryCrop] = useState('Wheat')
@@ -40,6 +37,7 @@ export default function LoanSchemes() {
   const [modalScheme, setModalScheme] = useState(null)
   const [checklistLoading, setChecklistLoading] = useState(false)
   const [checklistData, setChecklistData] = useState(null)
+  const [checklistError, setChecklistError] = useState(null)
 
   useEffect(() => {
     if (location.state?.prefilledCrop) {
@@ -76,6 +74,7 @@ export default function LoanSchemes() {
   const handleOpenChecklist = async (scheme) => {
     setModalScheme(scheme)
     setChecklistData(null)
+    setChecklistError(null)
     try {
       setChecklistLoading(true)
       const res = await downloadChecklist({
@@ -86,9 +85,11 @@ export default function LoanSchemes() {
       })
       if (res.status === 'ok') {
         setChecklistData(res.data)
+      } else {
+        setChecklistError(res.error?.message || 'Failed to load checklist.')
       }
     } catch (err) {
-      console.error(err)
+      setChecklistError(err.message || 'Could not reach checklist service.')
     } finally {
       setChecklistLoading(false)
     }
@@ -103,7 +104,8 @@ export default function LoanSchemes() {
     downloadLink.click()
   }
 
-  const readiness = result?.readiness_score
+  const readiness = result?.readiness_score || result?.readiness
+  const breakdown = readiness?.breakdown
 
   return (
     <div className="max-w-4xl mx-auto space-y-6 pb-20 md:pb-8">
@@ -324,6 +326,44 @@ export default function LoanSchemes() {
             </div>
           </div>
 
+          {/* Readiness breakdown bars */}
+          {breakdown && (
+            <div className="pt-2 border-t border-gray-100">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-3">
+                Score Breakdown
+              </h4>
+              <div className="space-y-2.5">
+                {(Array.isArray(breakdown)
+                  ? breakdown
+                  : Object.entries(breakdown).map(([key, value]) => ({
+                      label: key.replace(/_/g, ' '),
+                      score: typeof value === 'object' ? value.score ?? value.value : value,
+                      max: typeof value === 'object' ? value.max ?? 100 : 100
+                    }))
+                ).map((item, i) => {
+                  const label = item.label || item.name || item.factor || `Factor ${i + 1}`
+                  const score = Number(item.score ?? item.value ?? 0)
+                  const max = Number(item.max ?? 100) || 100
+                  const pct = Math.min(100, Math.round((score / max) * 100))
+                  return (
+                    <div key={i} className="space-y-1">
+                      <div className="flex justify-between text-xs font-medium text-gray-700">
+                        <span className="capitalize">{label}</span>
+                        <span className="font-bold text-gray-900">{score}/{max}</span>
+                      </div>
+                      <div className="w-full h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                        <div
+                          className="h-full rounded-full bg-teal-600 transition-all duration-500"
+                          style={{ width: `${pct}%` }}
+                        />
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          )}
+
           {/* Recommended Schemes Matching Wireframe 5 */}
           <div className="pt-4 border-t border-gray-100">
             <h4 className="text-sm font-bold text-gray-900 mb-3">
@@ -381,6 +421,53 @@ export default function LoanSchemes() {
               ))}
             </div>
           </div>
+
+          {/* Other schemes */}
+          {result.other_schemes && result.other_schemes.length > 0 && (
+            <div className="pt-4 border-t border-gray-100">
+              <h4 className="text-sm font-bold text-gray-900 mb-3">
+                Other Related Schemes
+              </h4>
+              <div className="space-y-2">
+                {result.other_schemes.map((scheme) => (
+                  <div
+                    key={scheme.id || scheme.code}
+                    className="p-3.5 rounded-xl border border-gray-100 bg-gray-50/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                  >
+                    <div>
+                      <div className="flex items-center gap-2 mb-0.5">
+                        <span className="px-2 py-0.5 rounded-md bg-gray-600 text-white text-[10px] font-bold">
+                          {scheme.short_name || scheme.code}
+                        </span>
+                        <h5 className="text-sm font-bold text-gray-800">{scheme.name}</h5>
+                      </div>
+                      {scheme.financial_benefit && (
+                        <p className="text-xs text-gray-600">{scheme.financial_benefit}</p>
+                      )}
+                      {scheme.match_reason && (
+                        <p className="text-[11px] text-gray-500">{scheme.match_reason}</p>
+                      )}
+                    </div>
+                    <button
+                      onClick={() => handleOpenChecklist(scheme)}
+                      className="px-3 py-2 rounded-xl bg-white hover:bg-gray-100 text-gray-800 text-xs font-bold border border-gray-200 flex items-center gap-1.5 cursor-pointer shrink-0"
+                    >
+                      <FileText className="w-3.5 h-3.5" />
+                      Checklist
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Official disclaimer */}
+          {(result.official_disclaimer || readiness.official_disclaimer) && (
+            <div className="p-3.5 bg-gray-50 rounded-xl border border-gray-200 text-[11px] text-gray-500 flex items-start gap-2">
+              <Info className="w-4 h-4 text-teal-700 shrink-0 mt-0.5" />
+              <p>{result.official_disclaimer || readiness.official_disclaimer}</p>
+            </div>
+          )}
         </div>
       )}
 
@@ -398,7 +485,10 @@ export default function LoanSchemes() {
                 </h3>
               </div>
               <button
-                onClick={() => setModalScheme(null)}
+                onClick={() => {
+                  setModalScheme(null)
+                  setChecklistError(null)
+                }}
                 className="p-1.5 rounded-full hover:bg-gray-100 text-gray-500"
               >
                 <X className="w-5 h-5" />
@@ -410,11 +500,31 @@ export default function LoanSchemes() {
                 <RefreshCw className="w-6 h-6 text-teal-600 animate-spin mx-auto mb-2" />
                 <p className="text-xs text-gray-500">{t('schemes.downloading')}</p>
               </div>
+            ) : checklistError ? (
+              <div className="p-4 bg-red-50 border border-red-200 rounded-xl text-red-800 text-xs flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 text-red-600 shrink-0" />
+                <span>{checklistError}</span>
+              </div>
             ) : checklistData ? (
               <div className="space-y-4">
-                <div className="p-3 bg-teal-50/60 rounded-xl text-xs text-teal-950 flex justify-between items-center">
-                  <span><strong>Portal:</strong> {checklistData.portal}</span>
-                  <span><strong>Helpline:</strong> {checklistData.official_helpline}</span>
+                <div className="p-3 bg-teal-50/60 rounded-xl text-xs text-teal-950 flex flex-wrap justify-between items-center gap-2">
+                  <span className="flex items-center gap-1.5">
+                    <strong>Portal:</strong>{' '}
+                    {checklistData.portal_url || (checklistData.portal?.startsWith?.('http') ? checklistData.portal : null) ? (
+                      <a
+                        href={checklistData.portal_url || checklistData.portal}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-teal-700 font-semibold underline inline-flex items-center gap-1 hover:text-teal-900"
+                      >
+                        {checklistData.portal_label || checklistData.portal || 'Open portal'}
+                        <ExternalLink className="w-3 h-3" />
+                      </a>
+                    ) : (
+                      <span>{checklistData.portal || '—'}</span>
+                    )}
+                  </span>
+                  <span><strong>Helpline:</strong> {checklistData.official_helpline || '—'}</span>
                 </div>
 
                 <div>
@@ -448,6 +558,37 @@ export default function LoanSchemes() {
                     ))}
                   </div>
                 </div>
+
+                {/* Submission steps */}
+                {checklistData.submission_steps && checklistData.submission_steps.length > 0 && (
+                  <div>
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-2">
+                      Submission Steps
+                    </h4>
+                    <div className="space-y-2">
+                      {checklistData.submission_steps.map((step, idx) => (
+                        <div
+                          key={idx}
+                          className="flex items-start gap-3 p-3 bg-teal-50/40 rounded-xl border border-teal-100 text-xs"
+                        >
+                          <span className="w-6 h-6 rounded-lg bg-teal-700 text-white font-bold text-[10px] flex items-center justify-center shrink-0">
+                            {idx + 1}
+                          </span>
+                          <p className="text-gray-800 leading-relaxed font-medium">
+                            {typeof step === 'string' ? step : step.title || step.text || step.description}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {checklistData.official_disclaimer && (
+                  <div className="p-3 bg-gray-50 rounded-xl border border-gray-200 text-[11px] text-gray-500 flex items-start gap-2">
+                    <Info className="w-3.5 h-3.5 text-teal-700 shrink-0 mt-0.5" />
+                    <p>{checklistData.official_disclaimer}</p>
+                  </div>
+                )}
 
                 {checklistData.pdf_base64 && (
                   <button

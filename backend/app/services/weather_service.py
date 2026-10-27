@@ -1,7 +1,5 @@
-import os
 from datetime import datetime
-from typing import Dict, Any, Optional
-import httpx
+from typing import Dict
 
 from backend.app.schemas import WeatherData, WeatherForecastDay
 
@@ -62,7 +60,82 @@ CACHED_WEATHER_DB = {
             {"day": "Day 2", "temp_max": 28.5, "temp_min": 20.5, "rain_chance": 30, "condition": "Overcast"},
             {"day": "Day 3", "temp_max": 29.0, "temp_min": 20.0, "rain_chance": 20, "condition": "Partly Cloudy"}
         ]
-    }
+    },
+    "moga": {
+        "temperature_c": 26.0,
+        "humidity_percent": 70,
+        "wind_speed_kmh": 10.5,
+        "precipitation_chance": 15,
+        "condition": "Partly Cloudy",
+        "spray_advisory_status": "FAVORABLE",
+        "spray_advisory_text": "Morning hours suitable for spraying. Keep finished by mid-day heat.",
+        "disease_weather_risk": "Moderate rust watch if overnight dew persists.",
+        "forecast": [
+            {"day": "Tomorrow", "temp_max": 27.5, "temp_min": 16.5, "rain_chance": 10, "condition": "Sunny"},
+            {"day": "Day 2", "temp_max": 27.0, "temp_min": 16.0, "rain_chance": 20, "condition": "Partly Cloudy"},
+            {"day": "Day 3", "temp_max": 26.2, "temp_min": 15.8, "rain_chance": 25, "condition": "Cloudy"}
+        ]
+    },
+    "jagraon": {
+        "temperature_c": 25.8,
+        "humidity_percent": 66,
+        "wind_speed_kmh": 12.0,
+        "precipitation_chance": 12,
+        "condition": "Clear",
+        "spray_advisory_status": "FAVORABLE",
+        "spray_advisory_text": "Wind under 15 km/h — good spray window before noon.",
+        "disease_weather_risk": "Low to moderate foliar disease pressure.",
+        "forecast": [
+            {"day": "Tomorrow", "temp_max": 27.0, "temp_min": 16.0, "rain_chance": 10, "condition": "Sunny"},
+            {"day": "Day 2", "temp_max": 26.5, "temp_min": 15.5, "rain_chance": 15, "condition": "Clear"},
+            {"day": "Day 3", "temp_max": 26.0, "temp_min": 15.0, "rain_chance": 20, "condition": "Partly Cloudy"}
+        ]
+    },
+    "khanna": {
+        "temperature_c": 26.2,
+        "humidity_percent": 64,
+        "wind_speed_kmh": 9.8,
+        "precipitation_chance": 8,
+        "condition": "Sunny",
+        "spray_advisory_status": "FAVORABLE",
+        "spray_advisory_text": "Dry canopy and light wind — favourable for fungicide or insecticide sprays.",
+        "disease_weather_risk": "Watch wheat rust if nights turn cooler with dew.",
+        "forecast": [
+            {"day": "Tomorrow", "temp_max": 28.0, "temp_min": 17.0, "rain_chance": 5, "condition": "Sunny"},
+            {"day": "Day 2", "temp_max": 27.5, "temp_min": 16.5, "rain_chance": 10, "condition": "Clear"},
+            {"day": "Day 3", "temp_max": 27.0, "temp_min": 16.0, "rain_chance": 15, "condition": "Partly Cloudy"}
+        ]
+    },
+    "hisar": {
+        "temperature_c": 28.4,
+        "humidity_percent": 55,
+        "wind_speed_kmh": 13.5,
+        "precipitation_chance": 5,
+        "condition": "Hazy Clear",
+        "spray_advisory_status": "CAUTION",
+        "spray_advisory_text": "Wind near 13–15 km/h — spray carefully to avoid drift; prefer early morning.",
+        "disease_weather_risk": "Low disease pressure; monitor cotton sucking pests.",
+        "forecast": [
+            {"day": "Tomorrow", "temp_max": 30.0, "temp_min": 18.5, "rain_chance": 5, "condition": "Sunny"},
+            {"day": "Day 2", "temp_max": 30.5, "temp_min": 18.0, "rain_chance": 5, "condition": "Clear"},
+            {"day": "Day 3", "temp_max": 29.5, "temp_min": 17.5, "rain_chance": 10, "condition": "Partly Cloudy"}
+        ]
+    },
+    "indore": {
+        "temperature_c": 27.8,
+        "humidity_percent": 60,
+        "wind_speed_kmh": 11.0,
+        "precipitation_chance": 18,
+        "condition": "Partly Cloudy",
+        "spray_advisory_status": "FAVORABLE",
+        "spray_advisory_text": "Suitable spray morning for soybean / wheat stands. Avoid late evening applications.",
+        "disease_weather_risk": "Moderate foliar disease risk if humidity rises overnight.",
+        "forecast": [
+            {"day": "Tomorrow", "temp_max": 29.0, "temp_min": 18.0, "rain_chance": 15, "condition": "Partly Cloudy"},
+            {"day": "Day 2", "temp_max": 28.5, "temp_min": 17.5, "rain_chance": 20, "condition": "Cloudy"},
+            {"day": "Day 3", "temp_max": 28.0, "temp_min": 17.0, "rain_chance": 25, "condition": "Light Rain Possible"}
+        ]
+    },
 }
 
 class WeatherService:

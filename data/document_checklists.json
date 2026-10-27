@@ -1,0 +1,110 @@
+{
+  "KCC": {
+    "scheme_name": "Kisan Credit Card",
+    "title": "KCC Document Checklist",
+    "portal": "https://www.nabard.org/kcc.aspx",
+    "official_helpline": "1800-180-1551",
+    "required_documents": [
+      {
+        "id": "aadhaar",
+        "name": "Aadhaar Card",
+        "description": "Original and photocopy of Aadhaar of the applicant.",
+        "mandatory": true
+      },
+      {
+        "id": "land",
+        "name": "Land Records (Khasra / Khatauni)",
+        "description": "Updated revenue records proving cultivation rights or ownership.",
+        "mandatory": true
+      },
+      {
+        "id": "passbook",
+        "name": "Bank Passbook / Cancelled Cheque",
+        "description": "Active savings account details for loan disbursement.",
+        "mandatory": true
+      },
+      {
+        "id": "photo",
+        "name": "Passport-size Photographs",
+        "description": "2–3 recent colour photographs.",
+        "mandatory": true
+      }
+    ],
+    "submission_steps": [
+      "1. Visit your nearest bank branch or Primary Agricultural Credit Society (PACS).",
+      "2. Fill the KCC application form and attach the documents listed above.",
+      "3. Complete KYC and land verification with the bank officer.",
+      "4. After sanction, collect the KCC RuPay card and activate it."
+    ]
+  },
+  "PM-KISAN": {
+    "scheme_name": "PM-KISAN Samman Nidhi",
+    "title": "PM-KISAN Document Checklist",
+    "portal": "https://pmkisan.gov.in/",
+    "official_helpline": "155261 / 011-24300606",
+    "required_documents": [
+      {
+        "id": "aadhaar",
+        "name": "Aadhaar Card",
+        "description": "Must be linked with bank account for DBT.",
+        "mandatory": true
+      },
+      {
+        "id": "land",
+        "name": "Land Ownership Proof",
+        "description": "Patwari-certified land records in the farmer's name.",
+        "mandatory": true
+      },
+      {
+        "id": "bank",
+        "name": "Bank Account with DBT",
+        "description": "Aadhaar-seeded account ready to receive instalments.",
+        "mandatory": true
+      }
+    ],
+    "submission_steps": [
+      "1. Register or update details on pmkisan.gov.in or at the local CSC / agriculture office.",
+      "2. Upload or submit Aadhaar and land records for e-KYC.",
+      "3. Ensure Aadhaar–bank seeding via NPCI mapper.",
+      "4. Track instalment status on the PM-KISAN portal."
+    ]
+  },
+  "PMFBY": {
+    "scheme_name": "Pradhan Mantri Fasal Bima Yojana",
+    "title": "PMFBY Document Checklist",
+    "portal": "https://pmfby.gov.in/",
+    "official_helpline": "14447",
+    "required_documents": [
+      {
+        "id": "aadhaar",
+        "name": "Aadhaar Card",
+        "description": "Identity proof of the cultivator.",
+        "mandatory": true
+      },
+      {
+        "id": "land",
+        "name": "Land / Tenancy Proof",
+        "description": "Ownership or lease documents for the insured plot.",
+        "mandatory": true
+      },
+      {
+        "id": "sowing",
+        "name": "Sowing Certificate",
+        "description": "Certificate from village agricultural officer if required by state rules.",
+        "mandatory": false
+      },
+      {
+        "id": "passbook",
+        "name": "Bank Passbook",
+        "description": "Account for premium debit and claim credit.",
+        "mandatory": true
+      }
+    ],
+    "submission_steps": [
+      "1. Enrol before the cut-off date for the season via bank, CSC, or pmfby.gov.in.",
+      "2. Select crop, village, and insured area; pay the farmer share of premium.",
+      "3. Keep the acknowledgement / policy document safe.",
+      "4. Report crop loss within the notified window for claim survey."
+    ]
+  }
+}

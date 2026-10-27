@@ -1,40 +1,28 @@
 import base64
 import io
-from typing import Any, Dict, Optional
+from typing import Any, Dict
 
-# Attempt to import ReportLab for PDF generation. If unavailable, provide a graceful fallback.
 try:
     from reportlab.lib.pagesizes import A4
-    from reportlab.pdfgen import canvas
+    from reportlab.pdfgen import canvas as pdf_canvas
+
+    REPORTLAB_AVAILABLE = True
 except Exception:  # pragma: no cover
-    # Minimal stubs when ReportLab is not installed.
-    A4 = (595.27, 841.89)  # Approximate A4 size in points.
-    class _DummyCanvas:
-        def __init__(self, buffer, pagesize=None):
-            self.buffer = buffer
-        def setFont(self, *args, **kwargs):
-            pass
-        def drawString(self, *args, **kwargs):
-            pass
-        def showPage(self):
-            pass
-        def save(self):
-            # Ensure the buffer is empty.
-            self.buffer.seek(0)
-            self.buffer.truncate()
-    def canvas(buffer, pagesize=None):  # type: ignore
-        return _DummyCanvas(buffer, pagesize=pagesize)
+    A4 = (595.27, 841.89)
+    pdf_canvas = None
+    REPORTLAB_AVAILABLE = False
+
 
 def generate_checklist_pdf(
     checklist_info: Dict[str, Any],
     farmer_name: str = "Farmer",
 ) -> str:
-    """Generate a printable checklist PDF and return it as a base64 string.
+    """Generate a printable checklist PDF and return it as a base64 string."""
+    if not REPORTLAB_AVAILABLE or pdf_canvas is None:
+        return ""
 
-    If the ReportLab library is unavailable, an empty base64 string is returned.
-    """
     buffer = io.BytesIO()
-    pdf = canvas(buffer, pagesize=A4)
+    pdf = pdf_canvas.Canvas(buffer, pagesize=A4)
     width, height = A4
     y = height - 55
 

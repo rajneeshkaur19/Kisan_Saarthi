@@ -12,15 +12,15 @@ import {
   Share2,
   RefreshCw,
   X,
-  FileText,
-  Sparkles
+  Sparkles,
+  Shield
 } from 'lucide-react'
-import { diagnoseLeaf } from '../api/client'
+import { diagnoseLeaf, normalizeLang } from '../api/client'
 
 export default function CropDoctor() {
   const { t, i18n } = useTranslation()
   const navigate = useNavigate()
-  const currentLang = i18n.language || 'en'
+  const currentLang = normalizeLang(i18n.language)
 
   const [selectedFile, setSelectedFile] = useState(null)
   const [previewUrl, setPreviewUrl] = useState(null)
@@ -132,15 +132,33 @@ export default function CropDoctor() {
     setErrorMsg(null)
   }
 
-  const handleShare = () => {
-    if (navigator.share && result) {
-      navigator.share({
-        title: `KisanSaarthi Diagnosis: ${result.disease_name}`,
-        text: `Crop: ${result.crop}\nDisease: ${result.disease_name}\nConfidence: ${result.confidence_percent}%\nTreatment: ${result.treatment_steps?.[0] || 'See full details'}`,
-        url: window.location.href
-      }).catch(() => {})
-    } else {
-      alert("Advice summary copied to clipboard!")
+  const handleShare = async () => {
+    if (!result) return
+
+    const shareText = `Crop: ${result.crop}\nDisease: ${result.disease_name}\nConfidence: ${result.confidence_percent}%\nTreatment: ${result.treatment_steps?.[0] || 'See full details'}`
+
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: `KisanSaarthi Diagnosis: ${result.disease_name}`,
+          text: shareText,
+          url: window.location.href
+        })
+      } catch {
+        /* user cancelled */
+      }
+      return
+    }
+
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(shareText)
+        alert('Advice summary copied to clipboard!')
+      } else {
+        alert(shareText)
+      }
+    } catch {
+      alert(shareText)
     }
   }
 
@@ -202,7 +220,7 @@ export default function CropDoctor() {
           <div className="bg-emerald-50/70 border border-emerald-100 rounded-2xl p-4">
             <p className="text-xs font-semibold text-emerald-950 uppercase tracking-wide mb-3 flex items-center gap-1.5">
               <Sparkles className="w-4 h-4 text-emerald-600" />
-              Select a verified leaf sample to test real MobileNetV2 inference:
+              Select a verified leaf sample to test diagnosis (works offline in demo mode):
             </p>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               {sampleLeaves.map((sample) => (
@@ -238,6 +256,7 @@ export default function CropDoctor() {
               <input
                 type="file"
                 accept="image/jpeg,image/png,image/webp"
+                capture="environment"
                 onChange={handleFileChange}
                 className="hidden"
               />
@@ -265,6 +284,7 @@ export default function CropDoctor() {
                   <input
                     type="file"
                     accept="image/jpeg,image/png,image/webp"
+                    capture="environment"
                     onChange={handleFileChange}
                     className="hidden"
                   />
@@ -319,7 +339,9 @@ export default function CropDoctor() {
                     {t('doctor.confidence')}: {result.confidence_percent}%
                   </span>
                 </div>
-                <p className="text-[10px] text-gray-400 mt-1">MobileNetV2 Inference</p>
+                <p className="text-[10px] text-gray-400 mt-1">
+                  {result.demo_mode ? 'Offline demo' : 'AI analysis'}
+                </p>
               </div>
             </div>
 
@@ -391,6 +413,32 @@ export default function CropDoctor() {
               </div>
             </div>
 
+            {/* Prevention */}
+            {result.prevention && (
+              <div>
+                <h4 className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-2 flex items-center gap-1.5">
+                  <Shield className="w-3.5 h-3.5 text-emerald-700" />
+                  Prevention
+                </h4>
+                {Array.isArray(result.prevention) ? (
+                  <div className="space-y-2">
+                    {result.prevention.map((step, idx) => (
+                      <div key={idx} className="flex items-start gap-3 p-3 bg-teal-50/50 rounded-xl border border-teal-100">
+                        <span className="w-6 h-6 rounded-lg bg-teal-700 text-white font-bold text-xs flex items-center justify-center shrink-0">
+                          {idx + 1}
+                        </span>
+                        <p className="text-xs text-gray-800 leading-relaxed font-medium">{step}</p>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-sm text-gray-700 bg-teal-50/50 p-3.5 rounded-xl border border-teal-100 leading-relaxed">
+                    {result.prevention}
+                  </p>
+                )}
+              </div>
+            )}
+
             {/* Caution Alert */}
             {result.caution && (
               <div className="p-3.5 bg-rose-50 border border-rose-200 rounded-xl flex items-start gap-2.5 text-rose-900 text-xs">
@@ -398,6 +446,40 @@ export default function CropDoctor() {
                 <div>
                   <span className="font-bold">{t('doctor.caution')}: </span>
                   <span>{result.caution}</span>
+                </div>
+              </div>
+            )}
+
+            {/* Related Schemes chips */}
+            {result.related_schemes && result.related_schemes.length > 0 && (
+              <div>
+                <h4 className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-2">
+                  Related Schemes
+                </h4>
+                <div className="flex flex-wrap gap-2">
+                  {result.related_schemes.map((scheme, idx) => {
+                    const label =
+                      typeof scheme === 'string'
+                        ? scheme
+                        : scheme.short_name || scheme.name || scheme.code || 'Scheme'
+                    return (
+                      <button
+                        key={idx}
+                        type="button"
+                        onClick={() =>
+                          navigate('/schemes', {
+                            state: {
+                              prefilledCrop: result.crop,
+                              sourceDisease: result.disease_name
+                            }
+                          })
+                        }
+                        className="text-xs bg-teal-50 hover:bg-teal-100 text-teal-900 border border-teal-200 px-3 py-1.5 rounded-xl font-semibold transition-colors cursor-pointer"
+                      >
+                        {label}
+                      </button>
+                    )
+                  })}
                 </div>
               </div>
             )}

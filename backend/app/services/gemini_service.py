@@ -1,5 +1,6 @@
 import os
 import json
+import time
 from typing import List, Optional, Dict, Any
 
 # Attempt to import the real Google Gemini SDK. If unavailable, provide minimal stubs.
@@ -35,7 +36,9 @@ except ImportError:  # pragma: no cover
 
 from pydantic import BaseModel, Field
 
-MODEL_NAME = os.getenv("GEMINI_MODEL", "gemini-3.8-flash")
+from backend.app.config import settings
+
+MODEL_NAME = settings.GEMINI_MODEL or os.getenv("GEMINI_MODEL", "gemini-3.5-flash")
 
 class GeminiRequest(BaseModel):
     prompt: str
@@ -56,18 +59,22 @@ class GeminiService:
     """Shared Gemini text and image analysis service with graceful fallbacks."""
 
     def __init__(self):
-        self.api_key = os.getenv("GEMINI_API_KEY")
+        self.api_key = (settings.GEMINI_API_KEY or os.getenv("GEMINI_API_KEY", "")).strip() or None
         self.client = None
         if self.api_key:
             try:
                 self.client = genai.Client(api_key=self.api_key)
             except Exception as exc:
-                # SDK missing or mis‑configured – we'll fall back later.
+                # SDK missing or mis-configured – we'll fall back later.
                 print(f"[GeminiService] Could not initialise client: {exc}")
                 self.client = None
 
     def _get_client(self, api_key: Optional[str] = None):
-        key = api_key or self.api_key or os.getenv("GEMINI_API_KEY")
+        key = (
+            api_key
+            or self.api_key
+            or (settings.GEMINI_API_KEY or os.getenv("GEMINI_API_KEY", "")).strip()
+        )
         if not key:
             raise RuntimeError("GEMINI_API_KEY is missing. Configure it in backend .env.")
         # If a different key is supplied, create a fresh client.
@@ -128,27 +135,8 @@ class GeminiService:
         try:
             client = self._get_client(api_key)
         except RuntimeError:
-            # Demo response – all fields populated with safe placeholders.
-            return {
-                "crop": "Unknown",
-                "disease_key": "unknown",
-                "disease_name": "Unable to identify",
-                "confidence_score": 0.0,
-                "confidence_percent": 0.0,
-                "severity": "unknown",
-                "is_inconclusive": True,
-                "is_uncertain": True,
-                "symptoms": "Image analysis not available.",
-                "treatment_steps": [],
-                "prevention": None,
-                "caution": "Gemini SDK not installed; this is a demo response.",
-                "related_schemes": [],
-                "mandi_crop": "",
-                "top_candidates": [],
-                "model_version": MODEL_NAME,
-                "model_loaded": False,
-                "source_attribution": "Gemini image analysis (demo)",
-            }
+            # Caller (disease_service) supplies a richer offline demo catalog.
+            raise
         mime_type = detect_image_mime(image_bytes)
         language_names = {"en": "English", "hi": "Hindi", "pa": "Punjabi"}
         output_language = language_names.get(language, "English")
@@ -190,57 +178,66 @@ Rules:
 - confidence_percent = confidence_score * 100.
 - Include every required JSON field.
 """
-        try:
-            response = client.models.generate_content(
-                model=MODEL_NAME,
-                contents=[
-                    types.Part.from_bytes(data=image_bytes, mime_type=mime_type),
-                    prompt,
-                ],
-                config=types.GenerateContentConfig(
-                    temperature=0.1,
-                    response_mime_type="application/json",
-                    max_output_tokens=1800,
-                ),
-            )
-            if not getattr(response, "text", None):
-                raise RuntimeError("Gemini returned no image analysis.")
-            result = json.loads(response.text)
-            required_fields = [
-                "crop",
-                "disease_key",
-                "disease_name",
-                "confidence_score",
-                "confidence_percent",
-                "severity",
-                "is_inconclusive",
-                "is_uncertain",
-                "symptoms",
-                "treatment_steps",
-                "caution",
-                "related_schemes",
-                "mandi_crop",
-                "top_candidates",
-                "model_version",
-                "model_loaded",
-                "source_attribution",
-            ]
-            missing = [f for f in required_fields if f not in result]
-            if missing:
-                raise RuntimeError(f"Gemini response is missing fields: {missing}")
-            score = float(result["confidence_score"])
-            if not 0.0 <= score <= 1.0:
-                raise RuntimeError("Gemini returned an invalid confidence score.")
-            result["confidence_score"] = score
-            result["confidence_percent"] = round(score * 100, 2)
-            result["model_version"] = MODEL_NAME
-            result["model_loaded"] = True
-            result["source_attribution"] = "Gemini image analysis"
-            return result
-        except (ValueError, TypeError, KeyError) as exc:
-            raise RuntimeError(f"Could not parse Gemini image analysis: {exc}") from exc
-        except Exception as exc:
-            raise RuntimeError(f"Gemini image analysis failed: {exc}") from exc
+        last_error: Optional[Exception] = None
+        for attempt in range(1, 4):
+            try:
+                response = client.models.generate_content(
+                    model=MODEL_NAME,
+                    contents=[
+                        types.Part.from_bytes(data=image_bytes, mime_type=mime_type),
+                        prompt,
+                    ],
+                    config=types.GenerateContentConfig(
+                        temperature=0.1,
+                        response_mime_type="application/json",
+                        max_output_tokens=1800,
+                    ),
+                )
+                if not getattr(response, "text", None):
+                    raise RuntimeError("Gemini returned no image analysis.")
+                result = json.loads(response.text)
+                required_fields = [
+                    "crop",
+                    "disease_key",
+                    "disease_name",
+                    "confidence_score",
+                    "confidence_percent",
+                    "severity",
+                    "is_inconclusive",
+                    "is_uncertain",
+                    "symptoms",
+                    "treatment_steps",
+                    "caution",
+                    "related_schemes",
+                    "mandi_crop",
+                    "top_candidates",
+                    "model_version",
+                    "model_loaded",
+                    "source_attribution",
+                ]
+                missing = [f for f in required_fields if f not in result]
+                if missing:
+                    raise RuntimeError(f"Gemini response is missing fields: {missing}")
+                score = float(result["confidence_score"])
+                if not 0.0 <= score <= 1.0:
+                    raise RuntimeError("Gemini returned an invalid confidence score.")
+                result["confidence_score"] = score
+                result["confidence_percent"] = round(score * 100, 2)
+                result["model_version"] = MODEL_NAME
+                result["model_loaded"] = True
+                result["source_attribution"] = "Gemini image analysis"
+                return result
+            except (ValueError, TypeError, KeyError) as exc:
+                raise RuntimeError(f"Could not parse Gemini image analysis: {exc}") from exc
+            except Exception as exc:
+                last_error = exc
+                msg = str(exc)
+                retryable = any(code in msg for code in ("503", "UNAVAILABLE", "429", "RESOURCE_EXHAUSTED"))
+                print(f"[Gemini Vision] attempt={attempt} {type(exc).__name__}: {exc}")
+                if not retryable or attempt == 3:
+                    break
+                time.sleep(1.5 * attempt)
+        raise RuntimeError(f"Gemini image analysis failed: {last_error}") from last_error
 
 def detect_image_mime(image_bytes: bytes) -> str:
     """Identify supported image formats using their file signatures."""

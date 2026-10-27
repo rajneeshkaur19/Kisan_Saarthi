@@ -1,72 +1,93 @@
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
 
-/* Basic health‑check endpoint */
-export async function checkHealth() {
-  const res = await fetch(`${API_BASE_URL}/health`);
-  if (!res.ok) throw new Error(`Health check failed with status ${res.status}`);
-  return res.json();
+export function normalizeLang(language = 'en') {
+  const code = String(language || 'en').slice(0, 2).toLowerCase();
+  return ['en', 'hi', 'pa'].includes(code) ? code : 'en';
 }
 
-/* Leaf‑diagnosis (file upload) */
+async function parseJson(res) {
+  const data = await res.json().catch(() => null);
+  if (!res.ok) {
+    const message =
+      data?.error?.message || `Request failed with status ${res.status}`;
+    const err = new Error(message);
+    err.status = res.status;
+    err.payload = data;
+    throw err;
+  }
+  return data;
+}
+
+export async function checkHealth() {
+  const res = await fetch(`${API_BASE_URL}/health`);
+  return parseJson(res);
+}
+
 export async function diagnoseLeaf(file, language = 'en') {
   const formData = new FormData();
   formData.append('file', file);
-  formData.append('language', language);
+  formData.append('language', normalizeLang(language));
 
   const res = await fetch(`${API_BASE_URL}/diagnose`, {
     method: 'POST',
     body: formData,
   });
-  return res.json();
+  return parseJson(res);
 }
 
-/* Mandi price lookup */
-export async function getMandiPrices(crop = '', mandi = '') {
+export async function getMandiPrices(crop = 'Wheat', mandi = 'ludhiana') {
   const params = new URLSearchParams();
   if (crop) params.append('crop', crop);
   if (mandi) params.append('mandi', mandi);
 
   const res = await fetch(`${API_BASE_URL}/prices?${params.toString()}`);
-  if (!res.ok) throw new Error(`Prices failed with status ${res.status}`);
-  return res.json();
+  return parseJson(res);
 }
 
-/* Government‑scheme eligibility check */
 export async function checkEligibility(payload) {
+  const body = {
+    ...payload,
+    language: normalizeLang(payload.language),
+  };
   const res = await fetch(`${API_BASE_URL}/eligibility`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
+    body: JSON.stringify(body),
   });
-  if (!res.ok) throw new Error(`Eligibility check failed with status ${res.status}`);
-  return res.json();
+  return parseJson(res);
 }
 
-/* Download eligibility checklist (PDF) */
 export async function downloadChecklist(payload) {
+  const body = {
+    scheme_id: payload.scheme_id,
+    language: normalizeLang(payload.language),
+    farmer_name: payload.farmer_name || 'Farmer',
+    include_pdf_base64: payload.include_pdf_base64 !== false,
+  };
   const res = await fetch(`${API_BASE_URL}/checklist`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
+    body: JSON.stringify(body),
   });
-  if (!res.ok) throw new Error(`Checklist download failed with status ${res.status}`);
-  return res.json();
+  return parseJson(res);
 }
 
-/* Chatbot message */
 export async function sendChatMessage(message, language = 'en', history = []) {
   const res = await fetch(`${API_BASE_URL}/chat`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ message, language, history }),
+    body: JSON.stringify({
+      message,
+      language: normalizeLang(language),
+      history,
+    }),
   });
-  if (!res.ok) throw new Error(`Chat request failed with status ${res.status}`);
-  return res.json();
+  return parseJson(res);
 }
 
-/* Weather for a district */
 export async function getWeather(district = 'ludhiana') {
-  const res = await fetch(`${API_BASE_URL}/weather?district=${encodeURIComponent(district)}`);
-  if (!res.ok) throw new Error(`Weather request failed with status ${res.status}`);
-  return res.json();
+  const res = await fetch(
+    `${API_BASE_URL}/weather?district=${encodeURIComponent(district)}`
+  );
+  return parseJson(res);
 }

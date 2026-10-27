@@ -12,7 +12,7 @@
 [![API Docs](https://img.shields.io/badge/📘_API_Docs-Swagger-009688?style=for-the-badge)](https://your-backend-link-here.com/docs)
 
 ![React](https://img.shields.io/badge/React-19-61DAFB?style=flat-square&logo=react&logoColor=white)
-![Vite](https://img.shields.io/badge/Vite-8-646CFF?style=flat-square&logo=vite&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-6-646CFF?style=flat-square&logo=vite&logoColor=white)
 ![Tailwind](https://img.shields.io/badge/Tailwind-4-38B2AC?style=flat-square&logo=tailwind-css&logoColor=white)
 ![FastAPI](https://img.shields.io/badge/FastAPI-Backend-009688?style=flat-square&logo=fastapi&logoColor=white)
 ![Python](https://img.shields.io/badge/Python-3.11+-3776AB?style=flat-square&logo=python&logoColor=white)
@@ -33,8 +33,9 @@
 4. [Tech Stack](#%EF%B8%8F-4-tech-stack)
 5. [Folder Structure](#-5-folder-structure)
 6. [Run It Locally](#-6-run-it-locally)
-7. [Future Improvements](#-7-future-improvements)
-8. [Team](#-8-team)
+7. [API Overview](#-7-api-overview)
+8. [Future Improvements](#-8-future-improvements)
+9. [Team](#-9-team)
 
 ---
 
@@ -74,15 +75,15 @@ One farmer journey: **detect the problem → know the price → get the money �
 
 | | Feature | What it does |
 |---|---|---|
-| 🌿 | **Crop Doctor** | Upload a leaf photo and get the disease name, confidence, symptoms and treatment steps. Blurry or unclear photos are flagged honestly instead of guessing. |
-| 📈 | **Mandi Prices** | Mandi-wise crop rates with trend charts and a simple Sell / Hold indicator. |
+| 🌿 | **Crop Doctor** | Upload a leaf photo and get the disease name, confidence, symptoms, prevention and treatment steps. Unclear photos are flagged honestly instead of guessing. |
+| 📈 | **Mandi Prices** | Mandi-wise crop rates with trend charts, nearby mandi comparison and a simple Sell / Hold indicator. |
 | 🏦 | **Loan & Scheme Guide** | Checks eligibility for schemes like KCC, PM-KISAN and PMFBY, gives a Credit Readiness Score and a **downloadable PDF checklist** of documents. |
-| 🤖 | **Ask Saarthi (AI Chat)** | Ask farming, scheme or loan questions in your own language, powered by **Google Gemini** with a grounded fallback. |
-| ☀️ | **Weather & Spray Advisory** | Tells whether the weather is suitable for spraying. |
-| 🌐 | **Multilingual UI** | Full interface in **English, हिन्दी and ਪੰਜਾਬੀ**, with voice input/output. |
-| 📱 | **Mobile-first design** | Works smoothly on a farmer's phone — bottom navigation, big buttons, simple screens. |
+| 🤖 | **Ask Saarthi (AI Chat)** | Ask farming, scheme or loan questions in your own language, powered by **Google Gemini**, with an offline FAQ fallback when the API is unavailable. |
+| ☀️ | **Weather & Spray Advisory** | District weather snapshot with spray-window guidance. |
+| 🌐 | **Multilingual UI** | Interface in **English, हिन्दी and ਪੰਜਾਬੀ**, with voice input/output. |
+| 📱 | **Mobile-first design** | Bottom navigation, large tap targets and simple screens for phone use. |
 
-> ⚠️ **Demo note:** The Gemini API key used in the live site is a **demo key** with limited quota. If AI chat is slow or unavailable, the app falls back to its built-in knowledge base.
+> ℹ️ **Offline-friendly AI:** If `GEMINI_API_KEY` is missing or Gemini is down, Crop Doctor and Chat still work using built-in demo diagnoses and scheme FAQ answers.
 
 ---
 
@@ -91,69 +92,107 @@ One farmer journey: **detect the problem → know the price → get the money �
 ### 🎨 Frontend
 | Technology | Use |
 |---|---|
-| ![React](https://img.shields.io/badge/-React_19-61DAFB?logo=react&logoColor=black) | UI components and pages |
-| ![Vite](https://img.shields.io/badge/-Vite-646CFF?logo=vite&logoColor=white) | Fast dev server and build tool |
-| ![Tailwind](https://img.shields.io/badge/-Tailwind_CSS_4-38B2AC?logo=tailwind-css&logoColor=white) | Responsive styling |
-| ![Router](https://img.shields.io/badge/-React_Router-CA4245?logo=reactrouter&logoColor=white) | Page navigation |
-| **Recharts** | Mandi price trend charts |
-| **i18next / react-i18next** | English · Hindi · Punjabi translations |
-| **Lucide React** | Icons |
-| **Web Speech API** | Voice input and voice output |
+| React 19 | UI components and pages |
+| Vite 6 | Dev server and build tool |
+| Tailwind CSS 4 | Responsive styling |
+| React Router | Page navigation |
+| Recharts | Mandi price trend charts |
+| i18next / react-i18next | English · Hindi · Punjabi |
+| Lucide React | Icons |
+| Web Speech API | Voice input and output |
 
 ### ⚙️ Backend
 | Technology | Use |
 |---|---|
-| ![FastAPI](https://img.shields.io/badge/-FastAPI-009688?logo=fastapi&logoColor=white) | REST API framework |
-| ![Python](https://img.shields.io/badge/-Python-3776AB?logo=python&logoColor=white) | Core language |
-| **Uvicorn** | ASGI server |
-| **Pydantic v2** | Request / response validation |
-| **SQLAlchemy + SQLite** | Database for cache and audit logs |
-| **FPDF** | PDF document checklist generation |
-| **httpx** | Calls to external APIs |
+| FastAPI | REST API |
+| Uvicorn | ASGI server |
+| Pydantic v2 / pydantic-settings | Validation + config |
+| SQLAlchemy + SQLite | Cache and audit logs |
+| ReportLab | PDF document checklists |
+| httpx | HTTP client |
+| python-multipart | Leaf image uploads |
 
-### 🧠 AI / ML & External APIs
+### 🧠 AI & data
 | Technology | Use |
 |---|---|
-| ![Gemini](https://img.shields.io/badge/-Google_Gemini-8E75B2?logo=googlegemini&logoColor=white) | AI chat assistant (demo key) |
-| **Kindwise Crop Health API** | Plant disease identification from leaf images |
-| **PyTorch + MobileNetV2** | Local crop model (experimental) |
-| **Scikit-learn (TF-IDF)** | Retrieval engine for grounded answers |
-| **Pillow + NumPy** | Image validation and preprocessing |
+| Google Gemini (`google-genai`) | Live chat + leaf image analysis |
+| Offline FAQ / demo catalog | Fallback when Gemini is unavailable |
+| Cached Agmarknet-style JSON | Mandi prices for local/demo use |
+| Scheme JSON rules | Eligibility scoring + checklists |
 
-### 🧪 Testing & Tools
-`pytest` · `oxlint` · `Git & GitHub` · PowerShell / Batch run scripts
+### 🧪 Testing & tools
+`scripts/smoke_test.py` · `scripts/http_live_test.py` · PowerShell / Batch run scripts · Git & GitHub
 
 ---
 
-## 🚀 5. Run It Locally
+## 📂 5. Folder Structure
+
+```text
+Kisan_Saarthi/
+├── backend/
+│   ├── app/
+│   │   ├── routers/          # /health /diagnose /prices /eligibility /checklist /chat /weather
+│   │   ├── services/         # Gemini, disease, mandi, chat, weather, eligibility
+│   │   ├── db/               # SQLAlchemy models + SQLite setup
+│   │   ├── utils/            # PDF checklist generator
+│   │   ├── config.py         # Settings from .env
+│   │   ├── schemas.py        # API contracts
+│   │   └── main.py           # FastAPI entrypoint
+│   └── requirements.txt
+├── frontend/
+│   ├── public/samples/       # Sample leaf images for Crop Doctor demos
+│   └── src/
+│       ├── pages/            # Home, CropDoctor, MandiPrices, LoanSchemes, Chatbot, Welcome
+│       ├── components/       # Navbar, Sidebar, BottomNav, LanguageSelector
+│       ├── api/client.js     # Frontend API client
+│       └── i18n/             # en / hi / pa dictionaries
+├── data/                     # schemes, eligibility rules, checklists, cached prices
+├── scripts/                  # Windows run + smoke test helpers
+├── .env.example              # Safe template (copy to .env)
+└── README.md
+```
+
+---
+
+## 🚀 6. Run It Locally
 
 ### Prerequisites
-- **Python** 3.11 or 3.12
-- **Node.js** 20+
-- A **Gemini API key** (free from [Google AI Studio](https://aistudio.google.com/)) and optionally a **Kindwise API key**
+- **Python 3.11+** (on Windows prefer the official installer / `py -3.11`; avoid MSYS2 Python for pip wheels)
+- **Node.js 20+**
+- A **Gemini API key** from [Google AI Studio](https://aistudio.google.com/) (optional but recommended for live AI)
 
-### Step 1 — Clone & set up environment
+### Step 1 — Clone & configure
 ```bash
-git clone https://github.com/<your-username>/KisanSaarthi.git
-cd KisanSaarthi
-cp .env.example .env        # Windows: Copy-Item .env.example .env
+git clone https://github.com/rajneeshkaur19/Kisan_Saarthi.git
+cd Kisan_Saarthi
+cp .env.example .env          # Windows: Copy-Item .env.example .env
 ```
 
-Open `.env` and add your keys:
+Edit `.env`:
 ```env
-GEMINI_API_KEY="your_gemini_key"
-KINDWISE_API_KEY="your_kindwise_key"
+GEMINI_API_KEY=your_gemini_key_here
+GEMINI_MODEL=gemini-3.5-flash
 ```
-> 🔒 Never commit your `.env` file or push API keys to GitHub.
 
-### Step 2 — Start the backend
+> 🔒 Never commit `.env` or push API keys to GitHub.
+
+### Step 2 — Backend
 ```bash
-pip install -r backend/requirements.txt
-python -m uvicorn backend.app.main:app --reload --port 8000
-```
-API docs: **http://localhost:8000/docs**
+# Windows (recommended)
+py -3.11 -m venv .venv
+.\.venv\Scripts\Activate.ps1
 
-### Step 3 — Start the frontend
+# macOS / Linux
+python3 -m venv .venv
+source .venv/bin/activate
+
+pip install -r backend/requirements.txt
+python -m uvicorn backend.app.main:app --reload --host 0.0.0.0 --port 8000
+```
+API docs: **http://localhost:8000/docs**  
+Health: **http://localhost:8000/health**
+
+### Step 3 — Frontend
 ```bash
 cd frontend
 npm install
@@ -161,40 +200,63 @@ npm run dev
 ```
 App: **http://localhost:5173**
 
-### ⚡ Windows shortcut
+### ⚡ Windows one-shot
 ```powershell
 .\scripts\run_all.ps1
 ```
 
-### 🌍 Pointing the frontend to your hosted backend
+### 🧪 Smoke tests
+```bash
+# Offline / contract checks (no live Gemini required)
+$env:PYTHONPATH = (Get-Location).Path
+.\.venv\Scripts\python.exe scripts\smoke_test.py
+
+# Live Gemini + all features (needs GEMINI_API_KEY and running server)
+.\.venv\Scripts\python.exe scripts\http_live_test.py
+```
+
+### 🌍 Point frontend at a hosted backend
 Create `frontend/.env`:
 ```env
-VITE_API_BASE_URL="https://your-backend-link-here.com"
+VITE_API_BASE_URL=https://your-backend-link-here.com
 ```
 
 ---
 
-## 🔮 7. Future Improvements
+## 📘 7. API Overview
 
-We are just getting started. Here is where **KisanSaarthi** goes next:
+| Method | Path | Purpose |
+|---|---|---|
+| `GET` | `/health` | Service + DB + Gemini key status |
+| `POST` | `/diagnose` | Leaf image diagnosis (`multipart/form-data`) |
+| `GET` | `/prices?crop=&mandi=` | Mandi prices + available crops/mandis |
+| `POST` | `/eligibility` | Credit readiness + scheme matches |
+| `POST` | `/checklist` | Document checklist + optional PDF (base64) |
+| `POST` | `/chat` | Ask Saarthi (Gemini + offline fallback) |
+| `GET` | `/weather?district=` | Weather + spray advisory |
+
+Interactive docs: `/docs`
+
+---
+
+## 🔮 8. Future Improvements
 
 ### 🚁 Drones + OpenCV for field work
-- Use **drones** to capture aerial images of full fields.
-- Use **OpenCV** to detect diseased patches, weed spread, crop stress and water shortage across the whole field, not just one leaf.
-- Give the farmer a simple colour-coded field health map.
+- Use drones for full-field imagery.
+- Detect diseased patches, weed spread, stress and water shortage across the field.
+- Show a simple colour-coded field health map.
 
 ### 📊 Real-world data & trained ML models
-- Replace the demo data with **real-world, live data** (live Agmarknet prices, weather and soil data).
-- Train and validate our own **ML models on large real crop-disease datasets** with proper accuracy testing.
-- Improve predictions with local data from Punjab, Haryana and other regions.
+- Live Agmarknet / weather / soil feeds.
+- Train and validate crop-disease models on large regional datasets (Punjab, Haryana and beyond).
 
-### 🤖 Gemini beyond the demo
-- The current Gemini key is for **demo purposes only**.
-- Move to a production-grade key with higher limits, faster responses and better context memory.
+### 🤖 Stronger production AI
+- Higher Gemini quotas and longer conversation memory.
+- Better grounding against official scheme documents.
 
 ### 🗣️ More languages
-- Add **more Indian languages**: Marathi, Gujarati, Bengali, Tamil, Telugu and more.
-- Improve voice support for local dialects.
+- Marathi, Gujarati, Bengali, Tamil, Telugu and more.
+- Improved voice support for local dialects.
 
 ### 🧩 More planned ideas
 - [ ] Offline mode for low-network villages
@@ -205,7 +267,7 @@ We are just getting started. Here is where **KisanSaarthi** goes next:
 
 ---
 
-## 👥 8. Team
+## 👥 9. Team
 
 **Team Gencoder** — Code Yudh Hackathon 2026, Chandigarh University, Mohali
 

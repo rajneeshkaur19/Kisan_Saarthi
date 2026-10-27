@@ -5,17 +5,13 @@ import {
   TrendingUp,
   MapPin,
   Wheat,
-  Calendar,
   AlertCircle,
-  CheckCircle,
   RefreshCw,
   Building2,
   Info
 } from 'lucide-react'
 import {
   ResponsiveContainer,
-  LineChart,
-  Line,
   XAxis,
   YAxis,
   Tooltip,
@@ -41,6 +37,33 @@ export default function MandiPrices() {
   useEffect(() => {
     fetchPrices(selectedCrop, selectedMandi)
   }, [selectedCrop, selectedMandi])
+
+  // Keep URL query params in sync with crop/mandi selection
+  useEffect(() => {
+    setSearchParams(
+      { crop: selectedCrop, mandi: selectedMandi },
+      { replace: true }
+    )
+  }, [selectedCrop, selectedMandi, setSearchParams])
+
+  // When available lists arrive, keep selection valid
+  useEffect(() => {
+    if (!data) return
+
+    if (data.available_crops?.length) {
+      const cropOk = data.available_crops.some(
+        (c) => c.toLowerCase() === selectedCrop.toLowerCase()
+      )
+      if (!cropOk) setSelectedCrop(data.available_crops[0])
+    }
+
+    if (data.available_mandis?.length) {
+      const mandiOk = data.available_mandis.some(
+        (m) => m.id === selectedMandi
+      )
+      if (!mandiOk) setSelectedMandi(data.available_mandis[0].id)
+    }
+  }, [data])
 
   const fetchPrices = async (crop, mandi) => {
     try {
@@ -325,7 +348,25 @@ export default function MandiPrices() {
             </div>
           </div>
         </div>
-      ) : null}
+      ) : (
+        <div className="bg-white rounded-2xl p-10 text-center border border-gray-100 flex flex-col items-center justify-center">
+          <AlertCircle className="w-8 h-8 text-gray-400 mb-3" />
+          <p className="text-sm font-semibold text-gray-700 mb-1">
+            No price record found
+          </p>
+          <p className="text-xs text-gray-500 max-w-sm">
+            No APMC modal rate matched this crop and mandi. Try another combination from the selectors above.
+          </p>
+          <button
+            type="button"
+            onClick={() => fetchPrices(selectedCrop, selectedMandi)}
+            className="mt-4 px-4 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold flex items-center gap-2 cursor-pointer"
+          >
+            <RefreshCw className="w-3.5 h-3.5" />
+            Retry
+          </button>
+        </div>
+      )}
     </div>
   )
 }

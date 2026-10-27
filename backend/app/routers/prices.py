@@ -1,33 +1,29 @@
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 
-from backend.app.schemas import APIResponse, PriceRecord, APIError
+from backend.app.schemas import APIResponse, PricesData, APIError
 from backend.app.db.database import get_db
 from backend.app.services.mandi_service import get_prices
 
 router = APIRouter(tags=["Mandi Prices"])
 
 
-@router.get("/prices", response_model=APIResponse[PriceRecord])
+@router.get("/prices", response_model=APIResponse[PricesData])
 def get_prices_endpoint(
-    crop: str = Query(..., description="Crop name (e.g., Wheat, Rice)"),
-    mandi: str = Query(..., description="Mandi / market name (e.g., ludhiana)"),
-    db: Session = Depends(get_db)
+    crop: str = Query("Wheat", description="Crop name (e.g., Wheat, Paddy)"),
+    mandi: str = Query("ludhiana", description="Mandi id (e.g., ludhiana)"),
+    db: Session = Depends(get_db),
 ):
-    """
-    Retrieve the latest price record for a given crop at a specific mandi.
-    The service falls back to a deterministic “insufficient data” payload when no record is found.
-    """
+    """Return selected mandi price plus available crop/mandi options."""
     try:
         result = get_prices(crop=crop, mandi=mandi, db=db)
-        # The service already returns a dict matching the PriceRecord schema
-        return APIResponse(status="ok", data=result["data"]["selected_record"], error=None)
+        return APIResponse(status="ok", data=PricesData(**result), error=None)
     except Exception as e:
         return APIResponse(
             status="error",
             data=None,
             error=APIError(
                 code="PRICE_FETCH_ERROR",
-                message=f"Unable to fetch price data: {str(e)}"
-            )
+                message=f"Unable to fetch price data: {str(e)}",
+            ),
         )

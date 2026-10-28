@@ -1,0 +1,81 @@
+import base64
+import io
+from typing import Any, Dict
+
+try:
+    from reportlab.lib.pagesizes import A4
+    from reportlab.pdfgen import canvas as pdf_canvas
+
+    REPORTLAB_AVAILABLE = True
+except Exception:  # pragma: no cover
+    A4 = (595.27, 841.89)
+    pdf_canvas = None
+    REPORTLAB_AVAILABLE = False
+
+
+def generate_checklist_pdf(
+    checklist_info: Dict[str, Any],
+    farmer_name: str = "Farmer",
+) -> str:
+    """Generate a printable checklist PDF and return it as a base64 string."""
+    if not REPORTLAB_AVAILABLE or pdf_canvas is None:
+        return ""
+
+    buffer = io.BytesIO()
+    pdf = pdf_canvas.Canvas(buffer, pagesize=A4)
+    width, height = A4
+    y = height - 55
+
+    pdf.setFont("Helvetica-Bold", 16)
+    pdf.drawString(45, y, str(checklist_info.get("title", "Scheme Checklist"))[:85])
+    y -= 28
+
+    pdf.setFont("Helvetica", 10)
+    pdf.drawString(45, y, f"Farmer: {farmer_name}"[:100])
+    y -= 22
+
+    for label, key in [
+        ("Scheme", "scheme_name"),
+        ("Official Portal", "portal"),
+        ("Helpline", "official_helpline"),
+    ]:
+        value = str(checklist_info.get(key, "N/A"))
+        pdf.drawString(45, y, f"{label}: {value}"[:110])
+        y -= 18
+
+    y -= 10
+    pdf.setFont("Helvetica-Bold", 12)
+    pdf.drawString(45, y, "Required Documents")
+    y -= 22
+    pdf.setFont("Helvetica", 10)
+
+    for item in checklist_info.get("required_documents", []):
+        name = str(item.get("name", "Document"))
+        mandatory = "Mandatory" if item.get("mandatory", True) else "Optional"
+        for line in [f"- {name} ({mandatory})", str(item.get("description", ""))]:
+            if y < 65:
+                pdf.showPage()
+                y = height - 55
+                pdf.setFont("Helvetica", 10)
+            pdf.drawString(50, y, line[:110])
+            y -= 15
+        y -= 5
+
+    y -= 8
+    pdf.setFont("Helvetica-Bold", 12)
+    pdf.drawString(45, y, "Submission Steps")
+    y -= 22
+    pdf.setFont("Helvetica", 10)
+
+    for step in checklist_info.get("submission_steps", []):
+        if y < 65:
+            pdf.showPage()
+            y = height - 55
+            pdf.setFont("Helvetica", 10)
+        pdf.drawString(50, y, f"- {str(step)}"[:110])
+        y -= 17
+
+    pdf.save()
+    encoded = base64.b64encode(buffer.getvalue()).decode("ascii")
+    buffer.close()
+    return encoded

@@ -1,0 +1,64 @@
+{
+  "readiness_tiers": [
+    {
+      "min_score": 80,
+      "max_score": 100,
+      "label": "Highly Ready",
+      "badge_color": "#16a34a",
+      "summary": {
+        "en": "Strong documentation and banking profile. You can apply with confidence.",
+        "hi": "दस्तावेज़ और बैंकिंग प्रोफ़ाइल मज़बूत है। आत्मविश्वास के साथ आवेदन करें।",
+        "pa": "ਦਸਤਾਵੇਜ਼ ਅਤੇ ਬੈਂਕਿੰਗ ਪ੍ਰੋਫਾਈਲ ਮਜ਼ਬੂਤ ਹੈ। ਵਿਸ਼ਵਾਸ ਨਾਲ ਅਰਜ਼ੀ ਦਿਓ।"
+      }
+    },
+    {
+      "min_score": 55,
+      "max_score": 79,
+      "label": "Almost Ready",
+      "badge_color": "#ca8a04",
+      "summary": {
+        "en": "You qualify for several schemes. Fix a few banking or land gaps for faster approval.",
+        "hi": "आप कई योजनाओं के लिए योग्य हैं। तेज़ मंज़ूरी के लिए बैंकिंग या ज़मीन संबंधी कमी पूरी करें।",
+        "pa": "ਤੁਸੀਂ ਕਈ ਯੋਜਨਾਵਾਂ ਲਈ ਯੋਗ ਹੋ। ਤੇਜ਼ ਮਨਜ਼ੂਰੀ ਲਈ ਬੈਂਕਿੰਗ ਜਾਂ ਜ਼ਮੀਨ ਸੰਬੰਧੀ ਕਮੀ ਪੂਰੀ ਕਰੋ।"
+      }
+    },
+    {
+      "min_score": 0,
+      "max_score": 54,
+      "label": "Needs Preparation",
+      "badge_color": "#dc2626",
+      "summary": {
+        "en": "Start with Aadhaar-linked DBT and updated land records before applying.",
+        "hi": "आवेदन से पहले आधार-लिंक्ड DBT और अपडेटेड भूमि रिकॉर्ड से शुरू करें।",
+        "pa": "ਅਰਜ਼ੀ ਤੋਂ ਪਹਿਲਾਂ ਆਧਾਰ-ਲਿੰਕਡ DBT ਅਤੇ ਅੱਪਡੇਟ ਜ਼ਮੀਨ ਰਿਕਾਰਡ ਤੋਂ ਸ਼ੁਰੂ ਕਰੋ।"
+      }
+    }
+  ],
+  "scheme_rules": {
+    "KCC": {
+      "requires_land_ownership": false,
+      "match_reason": {
+        "en": "You meet basic KCC criteria for short-term crop credit.",
+        "hi": "आप अल्पकालिक फसल ऋण के लिए केसीसी की मूल शर्तें पूरी करते हैं।",
+        "pa": "ਤੁਸੀਂ ਥੋੜ੍ਹੇ ਸਮੇਂ ਦੀ ਫਸਲ ਲੋਨ ਲਈ ਕੇਸੀਸੀ ਦੀਆਂ ਮੁੱਢਲੀਆਂ ਸ਼ਰਤਾਂ ਪੂਰੀਆਂ ਕਰਦੇ ਹੋ।"
+      }
+    },
+    "PM-KISAN": {
+      "requires_land_ownership": true,
+      "match_reason": {
+        "en": "Land-owning cultivator profile matches PM-KISAN eligibility.",
+        "hi": "भूमि-स्वामी कृषक प्रोफ़ाइल पीएम-किसान पात्रता से मेल खाती है।",
+        "pa": "ਜ਼ਮੀਨ-ਮਾਲਕ ਕਿਸਾਨ ਪ੍ਰੋਫਾਈਲ ਪੀਐਮ-ਕਿਸਾਨ ਯੋਗਤਾ ਨਾਲ ਮੇਲ ਖਾਂਦੀ ਹੈ।"
+      }
+    },
+    "PMFBY": {
+      "requires_land_ownership": false,
+      "eligible_crops": ["Wheat", "Paddy", "Cotton", "Mustard", "Maize", "Soybean", "Potato", "Onion", "Tomato"],
+      "match_reason": {
+        "en": "Your notified crop is covered under the current PMFBY season window.",
+        "hi": "आपकी अधिसूचित फसल वर्तमान पीएमएफबीवाई मौसम विंडो में कवर है।",
+        "pa": "ਤੁਹਾਡੀ ਨੋਟੀਫਾਈਡ ਫਸਲ ਮੌਜੂਦਾ ਪੀਐਮਐਫਬੀਵਾਈ ਮੌਸਮ ਵਿੰਡੋ ਵਿੱਚ ਕਵਰ ਹੈ।"
+      }
+    }
+  }
+}

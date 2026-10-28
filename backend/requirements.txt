@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+python-dotenv
+sqlalchemy
+pydantic-settings
+python-multipart
+httpx
+google-genai
+reportlab

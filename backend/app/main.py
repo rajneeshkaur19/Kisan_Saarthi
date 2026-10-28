@@ -1,4 +1,4 @@
-﻿import os
+import os
 from dotenv import load_dotenv
 
 PROJECT_ROOT = os.path.dirname(
@@ -23,9 +23,9 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
-from backend.app.config import settings
-from backend.app.db.database import init_db
-from backend.app.routers import (
+from app.config import settings
+from app.db.database import init_db
+from app.routers import (
     health,
     diagnose,
     prices,

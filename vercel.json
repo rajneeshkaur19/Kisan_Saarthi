@@ -1,0 +1,29 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "services": {
+    "backend": {
+      "root": "backend",
+      "framework": "fastapi",
+      "buildCommand": "pip install -r requirements.txt"
+    },
+    "frontend": {
+      "root": "frontend",
+      "framework": "vite",
+      "buildCommand": "npm install && npm run build",
+      "outputDirectory": "dist"
+    }
+  },
+  "rewrites": [
+    { "source": "/health",         "destination": { "service": "backend" } },
+    { "source": "/diagnose",       "destination": { "service": "backend" } },
+    { "source": "/prices",         "destination": { "service": "backend" } },
+    { "source": "/eligibility",    "destination": { "service": "backend" } },
+    { "source": "/checklist",      "destination": { "service": "backend" } },
+    { "source": "/chat",           "destination": { "service": "backend" } },
+    { "source": "/weather",        "destination": { "service": "backend" } },
+    { "source": "/api/(.*)",       "destination": { "service": "backend" } },
+    { "source": "/docs",           "destination": { "service": "backend" } },
+    { "source": "/redoc",          "destination": { "service": "backend" } },
+    { "source": "/(.*)",           "destination": { "service": "frontend" } }
+  ]
+}

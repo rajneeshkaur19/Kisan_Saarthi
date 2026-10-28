@@ -1,4 +1,6 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+// In production (Vercel), both frontend & backend share the same domain,
+// so we use relative URLs. In local dev, fall back to localhost:8000.
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? (import.meta.env.PROD ? '' : 'http://localhost:8000');
 
 export function normalizeLang(language = 'en') {
   const code = String(language || 'en').slice(0, 2).toLowerCase();

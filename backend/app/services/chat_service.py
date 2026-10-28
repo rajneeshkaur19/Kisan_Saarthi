@@ -8,8 +8,8 @@ try:
 except Exception:
     genai = None
 
-from backend.app.config import settings
-from backend.app.schemas import ChatRequest, ChatData, RetrievedPassage
+from app.config import settings
+from app.schemas import ChatRequest, ChatData, RetrievedPassage
 
 MODEL_NAME = settings.GEMINI_MODEL or os.getenv("GEMINI_MODEL", "gemini-3.5-flash")
 

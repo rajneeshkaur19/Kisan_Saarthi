@@ -5,9 +5,9 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from sqlalchemy import text
 
-from backend.app.config import settings
-from backend.app.db.database import get_db
-from backend.app.schemas import APIResponse, HealthData
+from app.config import settings
+from app.db.database import get_db
+from app.schemas import APIResponse, HealthData
 
 router = APIRouter(tags=["Health"])
 

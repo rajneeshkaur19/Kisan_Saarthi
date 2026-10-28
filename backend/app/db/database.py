@@ -44,7 +44,7 @@ def get_db():
 # ----------------------------------------------------------------------
 def init_db():
     """Create all tables defined in `backend.app.db.models`."""
-    from backend.app.db import models  # Imported lazily to avoid circular imports
+    from app.db import models  # Imported lazily to avoid circular imports
     Base.metadata.create_all(bind=engine)
 
 

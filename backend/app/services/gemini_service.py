@@ -36,7 +36,7 @@ except ImportError:  # pragma: no cover
 
 from pydantic import BaseModel, Field
 
-from backend.app.config import settings
+from app.config import settings
 
 MODEL_NAME = settings.GEMINI_MODEL or os.getenv("GEMINI_MODEL", "gemini-3.5-flash")
 

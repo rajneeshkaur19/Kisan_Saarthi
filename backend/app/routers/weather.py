@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Query
-from backend.app.schemas import APIResponse, WeatherData, APIError
-from backend.app.services.weather_service import get_weather
+from app.schemas import APIResponse, WeatherData, APIError
+from app.services.weather_service import get_weather
 
 router = APIRouter(tags=["Weather"])
 

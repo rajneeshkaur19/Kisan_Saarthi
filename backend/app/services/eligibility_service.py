@@ -3,13 +3,13 @@ import json
 from typing import Dict, Any, List, Optional
 from sqlalchemy.orm import Session
 
-from backend.app.config import settings
-from backend.app.schemas import (
+from app.config import settings
+from app.schemas import (
     EligibilityRequest, EligibilityData, ReadinessScore, EligibleScheme,
     ChecklistRequest, ChecklistData, DocumentItem
 )
-from backend.app.db.models import EligibilityAssessment
-from backend.app.utils.pdf_generator import generate_checklist_pdf
+from app.db.models import EligibilityAssessment
+from app.utils.pdf_generator import generate_checklist_pdf
 
 class EligibilityService:
     def __init__(self):

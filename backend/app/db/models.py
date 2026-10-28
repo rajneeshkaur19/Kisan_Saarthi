@@ -1,7 +1,7 @@
-﻿from sqlalchemy import Boolean, Column, DateTime, Float, Integer, String, Text
+from sqlalchemy import Boolean, Column, DateTime, Float, Integer, String, Text
 from sqlalchemy.sql import func
 
-from backend.app.db.database import Base
+from app.db.database import Base
 
 
 class DiagnosisAudit(Base):

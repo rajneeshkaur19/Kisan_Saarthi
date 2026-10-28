@@ -1,7 +1,7 @@
-﻿from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
-from backend.app.schemas import (
+from app.schemas import (
     APIResponse,
     EligibilityRequest,
     EligibilityData,
@@ -9,8 +9,8 @@ from backend.app.schemas import (
     ChecklistData,
     APIError,
 )
-from backend.app.db.database import get_db
-from backend.app.services.eligibility_service import (
+from app.db.database import get_db
+from app.services.eligibility_service import (
     evaluate_eligibility,
     get_eligibility_service,
 )

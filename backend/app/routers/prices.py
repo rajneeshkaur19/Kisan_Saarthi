@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 
-from backend.app.schemas import APIResponse, PricesData, APIError
-from backend.app.db.database import get_db
-from backend.app.services.mandi_service import get_prices
+from app.schemas import APIResponse, PricesData, APIError
+from app.db.database import get_db
+from app.services.mandi_service import get_prices
 
 router = APIRouter(tags=["Mandi Prices"])
 

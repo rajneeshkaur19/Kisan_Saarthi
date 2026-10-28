@@ -4,8 +4,8 @@ from typing import Any, Dict, List, Optional
 
 from sqlalchemy.orm import Session
 
-from backend.app.db.models import DiagnosisAudit
-from backend.app.services.gemini_service import analyze_leaf_image
+from app.db.models import DiagnosisAudit
+from app.services.gemini_service import analyze_leaf_image
 
 
 def _pick_lang(payload: Dict[str, Any], language: str) -> Any:
@@ -349,7 +349,7 @@ def diagnose_leaf_image(
     if not image_bytes or len(image_bytes) < 100:
         raise ValueError("Uploaded file is empty or corrupted.")
 
-    from backend.app.config import settings
+    from app.config import settings
 
     api_key = (settings.GEMINI_API_KEY or os.getenv("GEMINI_API_KEY", "")).strip()
     result: Optional[Dict[str, Any]] = None

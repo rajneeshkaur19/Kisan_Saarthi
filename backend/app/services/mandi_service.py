@@ -4,8 +4,8 @@ from typing import Any, Dict, List, Optional
 
 from sqlalchemy.orm import Session
 
-from backend.app.config import settings
-from backend.app.db.models import MandiPriceCache
+from app.config import settings
+from app.db.models import MandiPriceCache
 
 
 def _normalize_nearby(items: Optional[List[Dict[str, Any]]]) -> List[Dict[str, Any]]:

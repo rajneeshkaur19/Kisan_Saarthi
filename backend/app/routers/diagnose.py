@@ -2,9 +2,9 @@ from fastapi import APIRouter, UploadFile, File, Form, Depends, HTTPException, s
 from sqlalchemy.orm import Session
 from typing import Optional
 
-from backend.app.schemas import APIResponse, DiagnoseData, APIError
-from backend.app.db.database import get_db
-from backend.app.services.disease_service import diagnose_leaf_image
+from app.schemas import APIResponse, DiagnoseData, APIError
+from app.db.database import get_db
+from app.services.disease_service import diagnose_leaf_image
 
 router = APIRouter(tags=["Crop Doctor"])
 

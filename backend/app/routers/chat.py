@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 
-from backend.app.schemas import APIResponse, ChatRequest, ChatData, APIError
-from backend.app.services.chat_service import get_chat_service
+from app.schemas import APIResponse, ChatRequest, ChatData, APIError
+from app.services.chat_service import get_chat_service
 
 router = APIRouter(tags=["Ask Saarthi Chat"])
 

@@ -3,7 +3,7 @@
 # ------------------------------------------------------------
 
 from fastapi import APIRouter, Depends, HTTPException
-from backend.app.services.gemini_service import (
+from app.services.gemini_service import (
     GeminiRequest,
     GeminiResponse,
     get_gemini_service,

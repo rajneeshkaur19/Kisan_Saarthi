@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Dict
 
-from backend.app.schemas import WeatherData, WeatherForecastDay
+from app.schemas import WeatherData, WeatherForecastDay
 
 DISTRICT_COORDINATES = {
     "ludhiana": {"name": "Ludhiana", "state": "Punjab", "lat": 30.9010, "lon": 75.8573},
